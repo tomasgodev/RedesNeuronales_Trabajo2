@@ -1,0 +1,21 @@
+{
+  "semilla": 56,
+  "frac_train": 0.7,
+  "frac_val": 0.15,
+  "capas_ocultas": [
+    64,
+    32,
+    16
+  ],
+  "activacion": "tanh",
+  "dropout": 0.2,
+  "perdida": "mse",
+  "lr": 0.0003,
+  "weight_decay": 1e-05,
+  "batch_size": 512,
+  "epocas": 100,
+  "paciencia": 10,
+  "n_busqueda": 30,
+  "n_semillas": 30,
+  "rehacer_experimentos": false
+}
