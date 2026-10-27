@@ -34,7 +34,7 @@ Todos los números salen de las salidas guardadas en los notebooks o de los scri
 
 Estimamos con perceptrones multicapa dos cantidades de créditos de consumo de Lending Club: la probabilidad de incumplimiento (PD) y la pérdida dado incumplimiento (LGD). Los comparamos con una regresión logística y una regresión lineal, con las mismas variables, la misma partición temporal y un presupuesto de búsqueda explícito.
 
-Con 193,050 créditos originados entre 2012 y 2015, las redes de PD alcanzan un AUC de 0.703 a 0.704 en prueba (media de 30 semillas), igual al de la regresión logística (0.703). Después de corregir el efecto del peso de clase, ambos modelos quedan bien calibrados. En LGD, la red tiene menor RMSE que la regresión lineal (0.081 frente a 0.093), pero esa ventaja viene de acertar el nivel de una LGD inflada por el recobro incompleto: la regresión lineal ordena mejor a los clientes.
+Con 193,050 créditos originados entre 2012 y 2015, la red final de PD alcanza un AUC de 0.703 en prueba (media de 30 semillas), igual al de la regresión logística (0.703); la mejor configuración de una búsqueda de 31 llega a 0.704. Después de corregir el efecto del peso de clase, ambos modelos quedan bien calibrados. En LGD, la red tiene menor RMSE que la regresión lineal (0.081 frente a 0.093), pero esa ventaja viene de acertar el nivel de una LGD inflada por el recobro incompleto: la regresión lineal ordena mejor a los clientes.
 
 Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ordena el riesgo: el incumplimiento va de 50 % en el decil de menor puntaje a 5.7 % en el de mayor puntaje. Explicamos cuántos puntos aporta cada variable y estimamos una pérdida esperada de 18.7 % del monto en el periodo de prueba. Cada experimento se reproduce con un solo comando, y la aplicación web permite a cualquier persona calcular su puntaje y ver cómo cambiaría.
 
@@ -286,7 +286,9 @@ La ganadora es la red más pequeña de la búsqueda: una sola capa oculta de 32 
 
 *Fuente:* elaboración propia, `python scripts/parte1_busqueda.py` (`resultados/semillas_pd.csv`). Para el Brier, mejor es menor.
 
-La red de la búsqueda es un poco mejor y más estable que la base, con un tercio de los parámetros. Las dos quedan a menos de 0.002 de AUC de la regresión logística (Tabla 5). Para la scorecard, la aplicación y la pérdida esperada usamos la red base guardada por el notebook (`weights/modelo_clasificador.pth`). La red de la búsqueda está en `weights/modelo_pd_busqueda.pth`. **[PENDIENTE: decidir con el equipo cuál red queda como final.]**
+La red de la búsqueda es un poco mejor y más estable que la base, con un tercio de los parámetros. Las dos quedan a menos de 0.002 de AUC de la regresión logística (Tabla 5).
+
+**Red final.** Mantenemos como final la red base (`weights/modelo_clasificador.pth`), que es la que usan la scorecard, la aplicación y la pérdida esperada. Su diferencia con la ganadora de la búsqueda es de 0.0012 de AUC en prueba, y el Brier es el mismo (0.1713), así que no tiene importancia práctica para la decisión de crédito. La búsqueda la reportamos como evidencia de que ajustar la arquitectura no cambia el desempeño de forma relevante. La red de la búsqueda queda guardada en `weights/modelo_pd_busqueda.pth`.
 
 ### 3.6 Scorecard
 
@@ -646,7 +648,7 @@ Todos los modelos de una misma tarea usan el mismo preprocesamiento (`src/prepro
 | Tarea | Modelo | Parámetros | Configuraciones | Tiempo de búsqueda | Tiempo de 30 semillas | Métrica en prueba |
 |---|---|---|---|---|---|---|
 | PD | Regresión logística | 83 | 1 | 0.3 s | — (determinista) | AUC = 0.7033 |
-| PD | Red base | 8,161 | 1 (fijada a mano) | — | 7.9 min | AUC = 0.7031 ± 0.0011 |
+| PD | Red base (final) | 8,161 | 1 (fijada a mano) | — | 7.9 min | AUC = 0.7031 ± 0.0011 |
 | PD | Red de la búsqueda | 2,753 | 31 | 9.6 min | 7.6 min | AUC = 0.7043 ± 0.0007 |
 | LGD | Media de entrenamiento | 1 | 1 | 0 s | — | RMSE = 0.0950 |
 | LGD | Regresión lineal | 83 | 1 | 0.08 s | — (determinista) | RMSE = 0.0926 |
