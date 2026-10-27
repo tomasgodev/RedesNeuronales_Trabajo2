@@ -1,0 +1,5 @@
+loan_status,n,pct_con_recuperacion,out_prncp_promedio
+Charged Off,45248,53.45,0.0
+Default,1219,0.0,11594.991558654636
+Does not meet the credit policy. Status:Charged Off,761,64.39,0.0
+Late (31-120 days),11591,0.0,11689.55592097317

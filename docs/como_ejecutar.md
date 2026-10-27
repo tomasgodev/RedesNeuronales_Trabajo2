@@ -25,14 +25,17 @@ Verificado el 27 de octubre de 2026: con la versión 3 del conjunto, este comand
 | Comando | Qué hace | Tiempo |
 |---|---|---|
 | `python scripts/demo_sustentacion.py` | **Demostración en vivo.** Entrena la red de la Parte 1, la compara con la logística y calcula la scorecard y la pérdida esperada. | 14 s |
-| `python scripts/parte1_evaluacion.py` | Evalúa la logística y la red guardada, construye la scorecard e interpreta los modelos. Genera las figuras 9 a 14. | 10 s |
+| `python scripts/parte1_evaluacion.py` | Evalúa la logística y la red guardada, construye la scorecard e interpreta los modelos. Genera `blog/figuras/fig09` a `fig14`. | 10 s |
 | `python scripts/parte1_busqueda.py --demo` | Búsqueda de hiperparámetros y semillas en versión corta. | 10 s |
 | `python scripts/parte1_busqueda.py` | Búsqueda aleatoria (30 configuraciones más la base) y 30 semillas de la configuración final y de la base. | ≈ 35 min |
 | `python scripts/perdida_esperada.py` | Pérdida esperada $E[L] = PD \cdot LGD \cdot EAD$ en prueba con los modelos guardados. | 5 s |
 | `python scripts/parte1_descriptivo.py` | Hipótesis H1 a H4 y créditos excluidos por cosecha. Necesita el archivo original (sección 2). | 10 s |
-| `notebooks/regresion.ipynb` | Parte 2 (LGD). Pendiente pasarla a un script. | — |
+| `python scripts/parte2_lgd.py` | Parte 2 (LGD). Reproduce `notebooks/regresion.ipynb` sin internet: compara con los modelos guardados, calcula la EAD y la pérdida con PD = 1, y reentrena la configuración final (resultados idénticos al notebook). Genera `blog/figuras/fig06` a `fig08`. | 13 s |
+| `python scripts/parte2_lgd.py --demo` | Lo anterior más una búsqueda y semillas cortas. | 17 s |
+| `python scripts/parte2_lgd.py --busqueda` | Lo anterior más la búsqueda aleatoria (30) y las 30 semillas. Escribe en `resultados/parte2/` y no toca los resultados del notebook. | ≈ 8 min |
+| `python scripts/parte2_lgd.py --descriptivo` | Agrega las estadísticas de la LGD sobre todos los castigados y `blog/figuras/fig05`. Necesita el archivo original (sección 2). | 20 s |
 
-Los parámetros están en `configs/parte1.json` y también se pueden cambiar desde la línea de comandos, sin editar el código. Ejemplos para la modificación en vivo:
+Los parámetros están en `configs/parte1.json` y `configs/parte2.json`, y también se pueden cambiar desde la línea de comandos, sin editar el código. Ejemplos para la modificación en vivo:
 
 ```bash
 python scripts/demo_sustentacion.py --lr 0.01 --dropout 0.5
@@ -40,10 +43,13 @@ python scripts/demo_sustentacion.py --capas 128 64 --activacion tanh --epocas 10
 python scripts/demo_sustentacion.py --sin_peso_clase
 python scripts/demo_sustentacion.py --pdo 40 --puntaje_base 700 --odds_base 20
 python scripts/parte1_evaluacion.py --pdo 25 --puntaje_base 650
+python scripts/parte2_lgd.py --perdida bce --lr 0.003 --capas 32
 python scripts/demo_sustentacion.py --help
 ```
 
 Semillas: 56 para la búsqueda, la regresión logística usa `random_state=42`, y las corridas independientes usan las semillas 0 a 29.
+
+Reproducibilidad entre computadores: `scripts/parte2_lgd.py --busqueda` corrido en macOS (Apple M1) reproduce los resultados que `notebooks/regresion.ipynb` obtuvo en Windows. La configuración ganadora y las 30 semillas de la red final son idénticas (diferencias menores a $10^{-7}$). En 5 de las 30 configuraciones de la búsqueda el RMSE de validación difiere hasta en 0.0006, por diferencias numéricas de PyTorch entre plataformas.
 
 ## 4. Aplicación web
 
