@@ -60,6 +60,8 @@ streamlit run app/app_riesgo.py
 
 Usa los modelos guardados en `weights/`; no reentrena. `app/opciones_app.json` (categorías, valores por defecto y rangos) se regenera con `python scripts/preparar_app.py`, que necesita el archivo original.
 
+La app está publicada en https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/ (desplegada desde la cuenta del dueño del repositorio, con la rama `main`, así que se actualiza sola con cada cambio).
+
 ### Publicarla en Streamlit Community Cloud
 
 1. Entrar a https://share.streamlit.io con una cuenta de GitHub que tenga acceso al repositorio.

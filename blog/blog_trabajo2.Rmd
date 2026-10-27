@@ -24,7 +24,7 @@ Todos los números salen de las salidas guardadas en los notebooks o de los scri
 
 **Entrada publicada en RPubs:** **[PENDIENTE]**
 **Repositorio:** https://github.com/tomasgodev/RedesNeuronales_Trabajo2
-**Aplicación web:** **[PENDIENTE]**
+**Aplicación web:** https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/
 **Video promocional:** **[PENDIENTE]**
 **Videos de contribución individual:** **[PENDIENTE]**
 
