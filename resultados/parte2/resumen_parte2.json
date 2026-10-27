@@ -22,24 +22,5 @@
     "RMSE_val": 0.0765,
     "MAE_test": 0.0594,
     "RMSE_test": 0.0802
-  },
-  "busqueda": {
-    "configuraciones": 30,
-    "minutos": 2.3,
-    "mejor": {
-      "capas_ocultas": [
-        64,
-        32,
-        16
-      ],
-      "activacion": "tanh",
-      "dropout": 0.2,
-      "weight_decay": 1e-05,
-      "lr": 0.0003,
-      "batch_size": 512,
-      "perdida": "mse"
-    },
-    "semillas": 30,
-    "minutos_semillas": 5.2
   }
 }

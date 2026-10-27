@@ -301,9 +301,10 @@ def main():
         res = semillas[["MAE_val", "RMSE_val", "MAE_test", "RMSE_test"]].agg(["mean", "std", "min", "max"])
         res.index = ["media", "desv. estándar", "mejor", "peor"]
         print(f"\n[Celda 22] {n_semillas} semillas ({semillas['segundos'].sum() / 60:.1f} min):\n{res.round(4).to_string()}")
-        resumen["busqueda"] = {"configuraciones": n_busqueda, "minutos": round(busqueda["segundos"].sum() / 60, 1),
-                               "mejor": {k: mejor[k] for k in espacio},
-                               "semillas": n_semillas, "minutos_semillas": round(semillas["segundos"].sum() / 60, 1)}
+        resumen_busqueda = {"configuraciones": n_busqueda, "minutos": round(busqueda["segundos"].sum() / 60, 1),
+                            "mejor": {k: mejor[k] for k in espacio},
+                            "semillas": n_semillas, "minutos_semillas": round(semillas["segundos"].sum() / 60, 1)}
+        (salida / "resumen_busqueda_lgd.json").write_text(json.dumps(resumen_busqueda, indent=2, ensure_ascii=False))
 
     (salida / "resumen_parte2.json").write_text(json.dumps(resumen, indent=2, ensure_ascii=False))
     print(f"\nResultados en {salida.relative_to(RAIZ)} | tiempo total: {time.perf_counter() - t0:.1f} s")
