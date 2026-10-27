@@ -101,7 +101,7 @@ if __name__ == "__main__":
         print(f"  PD = {p*100:5.2f}%  -->  Score = {s:3d} pts")
     print("=" * 60)
 
-"""
+r"""
 Posible Codigo:
 
 python scripts/scorecard_engine.py
