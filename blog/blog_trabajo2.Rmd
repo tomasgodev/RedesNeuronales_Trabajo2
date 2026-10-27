@@ -77,7 +77,7 @@ Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ord
 
 ### 2.1 Fuente
 
-Usamos el conjunto *Credit Risk Analysis* de Kaggle (ranadeep, s. f.), versión 3, archivo `loan/loan.csv`: **887,379 registros y 74 variables**, de créditos originados entre **junio de 2007 y diciembre de 2015** (`issue_d`). Fecha de la descarga original del equipo: **[PENDIENTE]**. Para verificar la reproducibilidad lo descargamos de nuevo el 27 de octubre de 2026 (versión 3). Con esa descarga, `python -m src.preprocesamiento` produce un archivo idéntico a `datasets/creditos_procesados.csv.gz`. Los significados de las variables se citan del diccionario incluido en el conjunto (`datasets/LCDataDictionary.xlsx`).
+Usamos el conjunto *Credit Risk Analysis* de Kaggle (ranadeep, s. f.), versión 3, archivo `loan/loan.csv`: **887,379 registros y 74 variables**, de créditos originados entre **junio de 2007 y diciembre de 2015** (`issue_d`). Lo descargamos el 25 de octubre de 2026, en su versión 3, con `kagglehub`; el mensaje de descarga quedó guardado en el notebook `notebooks/limpieza.ipynb` del commit `df4b14c`. Para verificar la reproducibilidad lo descargamos de nuevo el 27 de octubre de 2026, también en la versión 3. Con esa descarga, `python -m src.preprocesamiento` produce un archivo idéntico a `datasets/creditos_procesados.csv.gz`. Los significados de las variables se citan del diccionario incluido en el conjunto (`datasets/LCDataDictionary.xlsx`).
 
 Un detalle del diccionario: no trae la variable `verification_status`, pero sí `is_inc_v`, *"Indicates if income was verified by LC, not verified, or if the income source was verified"*. Sus tres valores coinciden con los de `verification_status` en el archivo (`Not Verified`, `Source Verified`, `Verified`), así que tomamos esa definición.
 
@@ -927,7 +927,7 @@ Loshchilov, I., & Hutter, F. (2019). Decoupled weight decay regularization. En *
 
 Papke, L. E., & Wooldridge, J. M. (1996). Econometric methods for fractional response variables with an application to 401(k) plan participation rates. *Journal of Applied Econometrics, 11*(6), 619–632. https://doi.org/10.1002/(SICI)1099-1255(199611)11:6<619::AID-JAE418>3.0.CO;2-1
 
-ranadeep. (s. f.). *Credit risk analysis* [Conjunto de datos]. Kaggle. Recuperado el 27 de octubre de 2026 de https://www.kaggle.com/datasets/ranadeep/credit-risk-dataset
+ranadeep. (s. f.). *Credit risk analysis* [Conjunto de datos]. Kaggle. Recuperado el 25 de octubre de 2026 de https://www.kaggle.com/datasets/ranadeep/credit-risk-dataset
 
 Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning representations by back-propagating errors. *Nature, 323*(6088), 533–536. https://doi.org/10.1038/323533a0
 
