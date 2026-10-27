@@ -1,7 +1,7 @@
 """Casos de prueba: ¿la aplicación (app/app_riesgo.py) usa los modelos entrenados por el equipo?
 
 Uso:
-    python scripts/probar_app.py
+    python pruebas/probar_app.py
 
 No necesita internet. Compara lo que calcula el motor de la app (app/motor_riesgo.py) con los modelos
 guardados por los notebooks:

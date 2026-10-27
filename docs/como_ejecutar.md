@@ -56,8 +56,8 @@ Reproducibilidad entre computadores: `scripts/parte2_lgd.py --busqueda` corrido 
 
 | Comando | Qué prueba | Tiempo |
 |---|---|---|
-| `python scripts/probar_app.py` | Que la app use los modelos entrenados (mismos pesos, misma PD y LGD que los notebooks, mismas métricas) y que la interfaz no se caiga con valores extremos. | 50 s |
-| `python scripts/probar_robustez.py` | 100 casos que cambian cada parámetro de cada comando, incluidos valores extremos, inválidos y archivos de configuración dañados. Un valor inválido debe terminar con un mensaje claro, nunca con un error de Python. Corre sobre una copia temporal del repositorio. | ≈ 9 min |
+| `python pruebas/probar_app.py` | Que la app use los modelos entrenados (mismos pesos, misma PD y LGD que los notebooks, mismas métricas) y que la interfaz no se caiga con valores extremos. | 50 s |
+| `python pruebas/probar_robustez.py` | 100 casos que cambian cada parámetro de cada comando, incluidos valores extremos, inválidos y archivos de configuración dañados. Un valor inválido debe terminar con un mensaje claro, nunca con un error de Python. Corre sobre una copia temporal del repositorio. | ≈ 9 min |
 
 ## 4. Aplicación web
 
@@ -89,5 +89,5 @@ Necesita R con `rmarkdown` y pandoc (viene con RStudio).
 ## Notas
 
 - Los modelos de los notebooks están guardados en `weights/`, y los scripts los cargan sin reentrenar. `src/modelos.py` tiene copias exactas de las clases y funciones de los notebooks, porque un notebook no se puede importar desde un script.
-- `scripts/run_demo.py`, `scripts/evaluar_30_semillas_clasif.py` y `resultados/semillas_clasificacion.csv` generan o contienen métricas simuladas con números aleatorios, no con el modelo. Los resultados de los modelos están en `resultados/parte1/`, `resultados/semillas_pd.csv` y `resultados/perdida_esperada/`.
+- Los archivos que ya no se usan están en `archivo/`; su README explica qué es cada uno. Entre ellos, la primera app (no usaba los modelos) y dos scripts que generaban métricas simuladas. Los resultados de los modelos están en `resultados/parte1/`, `resultados/parte2/` y `resultados/perdida_esperada/`.
 - `codificar()` de `src/preprocesamiento.py` no sirve tal cual para codificar un solo solicitante: con una sola fila, `get_dummies(drop_first=True)` elimina la categoría presente. `app/motor_riesgo.py` explica cómo se evita.
