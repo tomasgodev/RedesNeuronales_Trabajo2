@@ -49,7 +49,7 @@ def leer_argumentos():
     g.add_argument("--sin_peso_clase", action="store_true", help="entrena sin pos_weight")
     s = p.add_argument_group("scorecard")
     s.add_argument("--puntaje_base", type=float, default=600)
-    s.add_argument("--odds_base", type=float, default=50)
+    s.add_argument("--odds_base", type=float, help="por defecto, las odds de la cartera de entrenamiento (N0/N1)")
     s.add_argument("--pdo", type=float, default=20)
     return p.parse_args()
 
@@ -111,9 +111,10 @@ def main():
             m = calcular_metricas_completas(y, probs[(clave, k)], k)
             linea(f"      {nombre:<22}{k:<12}{m['AUC']:>8.4f}{m['Gini']:>8.4f}{m['KS']:>8.4f}{m['Brier']:>8.4f}{m['Brier_Referencia']:>12.4f}")
 
-    sc = CreditScorecard(score_base=args.puntaje_base, odds_base=args.odds_base, pdo=args.pdo)
+    odds_base = args.odds_base if args.odds_base is not None else float((y_train == 0).sum() / (y_train == 1).sum())
+    sc = CreditScorecard(score_base=args.puntaje_base, odds_base=odds_base, pdo=args.pdo)
     puntajes = sc.probabilidad_a_score(probs[("red", "prueba")])
-    linea(f"\n[3/4] Scorecard: base {args.puntaje_base:g} | odds {args.odds_base:g}:1 | PDO {args.pdo:g} "
+    linea(f"\n[3/4] Scorecard: base {args.puntaje_base:g} | odds {odds_base:.3f}:1 | PDO {args.pdo:g} "
           f"→ Factor {sc.factor:.4f} | Offset {sc.offset:.4f}")
     linea(f"      Puntaje = {sc.offset:.2f} − {sc.factor:.2f} · ln(p / (1 − p))")
     linea(f"      Prueba: media {puntajes.mean():.1f} | desv. {puntajes.std():.1f} | percentiles 5/50/95: "

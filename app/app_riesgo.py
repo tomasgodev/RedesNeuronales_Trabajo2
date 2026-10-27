@@ -125,11 +125,12 @@ def main():
                     f"- 💻 {enlace('Repositorio', ENLACE_REPOSITORIO)}")
         st.markdown("### Parámetros de la scorecard")
         puntaje_base = st.number_input("Puntaje base", min_value=300, max_value=900, value=600, step=10, key="sc_base")
-        odds_base = st.number_input("Odds de referencia (buenos por cada malo)", min_value=1.0, max_value=500.0,
-                                    value=50.0, step=5.0, key="sc_odds")
+        odds_base = st.number_input("Odds de referencia (buenos por cada malo)", min_value=0.5, max_value=500.0,
+                                    value=round(motor.odds_cartera, 3), step=0.5, format="%.3f", key="sc_odds")
         pdo = st.number_input("Puntos para duplicar las odds (PDO)", min_value=5.0, max_value=100.0, value=20.0, step=5.0, key="sc_pdo")
-        st.caption("Con odds de 50:1, un puntaje de 600 equivale a una probabilidad de incumplimiento de 1.96 %. "
-                   "Cada vez que las odds de pagar se duplican, el puntaje sube PDO puntos.")
+        st.caption(f"Por defecto, las odds de referencia son las de la cartera de entrenamiento "
+                   f"({motor.odds_cartera:.2f} buenos por cada malo): un puntaje igual al puntaje base es el de un "
+                   f"cliente con el riesgo promedio. Cada vez que las odds de pagar se duplican, el puntaje sube PDO puntos.")
     sc = CreditScorecard(score_base=puntaje_base, odds_base=odds_base, pdo=pdo)
 
     st.title("¿Me prestas?")

@@ -20,7 +20,7 @@ Todos los números salen de las salidas guardadas en los notebooks o de los scri
 
 **Trabajo 2 · Redes neuronales y algoritmos bioinspirados · Universidad Nacional de Colombia, Facultad de Minas · 2026-02**
 
-**Equipo:** Tomás Gómez Cardona, Sebastián Ocampo Galvis, Juan Felipe Miranda Arciniegas y Juan José Baena García. **[PENDIENTE: confirmar integrantes y la parte de cada uno.]**
+**Equipo:** Tomás Gómez Cardona, Sebastián Ocampo Galvis, Juan Felipe Miranda Arciniegas, Ana Sofía Gómez Zapata y Juan José Baena García.
 
 **Entrada publicada en RPubs:** **[PENDIENTE]**
 **Repositorio:** https://github.com/tomasgodev/RedesNeuronales_Trabajo2
@@ -36,7 +36,7 @@ Estimamos con perceptrones multicapa dos cantidades de créditos de consumo de L
 
 Con 193,050 créditos originados entre 2012 y 2015, la red final de PD alcanza un AUC de 0.703 en prueba (media de 30 semillas), igual al de la regresión logística (0.703); la mejor configuración de una búsqueda de 31 llega a 0.704. Después de corregir el efecto del peso de clase, ambos modelos quedan bien calibrados. En LGD, la red tiene menor RMSE que la regresión lineal (0.081 frente a 0.093), pero esa ventaja viene de acertar el nivel de una LGD inflada por el recobro incompleto: la regresión lineal ordena mejor a los clientes.
 
-Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ordena el riesgo: el incumplimiento va de 50 % en el decil de menor puntaje a 5.7 % en el de mayor puntaje. Explicamos cuántos puntos aporta cada variable y estimamos una pérdida esperada de 18.7 % del monto en el periodo de prueba. Cada experimento se reproduce con un solo comando, y la aplicación web permite a cualquier persona calcular su puntaje y ver cómo cambiaría.
+Convertimos la PD en una scorecard en la que 600 puntos corresponden al cliente promedio y cada 20 puntos duplican las odds de pagar. La scorecard ordena el riesgo: el incumplimiento va de 49.8 % en el decil de menor puntaje a 5.6 % en el de mayor puntaje. Explicamos cuántos puntos aporta cada variable y estimamos una pérdida esperada de 18.7 % del monto en el periodo de prueba. Cada experimento se reproduce con un solo comando, y la aplicación web permite a cualquier persona calcular su puntaje y ver cómo cambiaría.
 
 ---
 
@@ -69,7 +69,7 @@ Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ord
 2. La exposición al incumplimiento se estima al originar, porque en ese momento no se sabe cuánto habrá pagado el cliente cuando incumpla (Sección 4.9).
 3. La aplicación web pide exactamente las mismas variables que usa el modelo.
 
-**Limitación.** El diccionario no dice en qué fecha se midieron las variables de historial de crédito; por ejemplo, `tot_cur_bal` es *"Total current balance of all accounts"*. Suponemos que corresponden a la fecha de la solicitud. **[PENDIENTE: buscar si hay una fuente que lo confirme.]**
+**Limitación.** El diccionario no dice en qué fecha se midieron las variables de historial de crédito; por ejemplo, `tot_cur_bal` es *"Total current balance of all accounts"*. Suponemos que corresponden a la fecha de la solicitud. Hay un indicio a favor. En los suplementos de prospecto que Lending Club presenta ante la SEC por cada crédito listado, variables como las cuentas en mora, las líneas abiertas y las moras de los últimos dos años aparecen como lo que *"a credit bureau reported"* sobre el solicitante en una fecha cercana a la emisión (LendingClub Corporation, 2020). Ese documento es de 2020, no del periodo de nuestros datos, así que lo tomamos como un indicio y no como una confirmación.
 
 ---
 
@@ -77,7 +77,7 @@ Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ord
 
 ### 2.1 Fuente
 
-Usamos el conjunto *Credit Risk Analysis* de Kaggle (ranadeep, s. f.), versión 3, archivo `loan/loan.csv`: **887,379 registros y 74 variables**, de créditos originados entre **junio de 2007 y diciembre de 2015** (`issue_d`). Fecha de la descarga original del equipo: **[PENDIENTE]**. Para verificar la reproducibilidad lo descargamos de nuevo el 27 de octubre de 2026 (versión 3). Con esa descarga, `python -m src.preprocesamiento` produce un archivo idéntico a `datasets/creditos_procesados.csv.gz`. Los significados de las variables se citan del diccionario incluido en el conjunto (`datasets/LCDataDictionary.xlsx`).
+Usamos el conjunto *Credit Risk Analysis* de Kaggle (ranadeep, s. f.), versión 3, archivo `loan/loan.csv`: **887,379 registros y 74 variables**, de créditos originados entre **junio de 2007 y diciembre de 2015** (`issue_d`). Lo descargamos el 25 de octubre de 2026, en su versión 3, con `kagglehub`; el mensaje de descarga quedó guardado en el notebook `notebooks/limpieza.ipynb` del commit `df4b14c`. Para verificar la reproducibilidad lo descargamos de nuevo el 27 de octubre de 2026, también en la versión 3. Con esa descarga, `python -m src.preprocesamiento` produce un archivo idéntico a `datasets/creditos_procesados.csv.gz`. Los significados de las variables se citan del diccionario incluido en el conjunto (`datasets/LCDataDictionary.xlsx`).
 
 Un detalle del diccionario: no trae la variable `verification_status`, pero sí `is_inc_v`, *"Indicates if income was verified by LC, not verified, or if the income source was verified"*. Sus tres valores coinciden con los de `verification_status` en el archivo (`Not Verified`, `Source Verified`, `Verified`), así que tomamos esa definición.
 
@@ -133,7 +133,11 @@ El resultado son **193,050 créditos y 82 variables de entrada**, originados ent
 
 *Fuente:* elaboración propia, `notebooks/procesamiento.ipynb` (celda 14).
 
-**Limitación.** La selección por ANOVA, correlación y V de Cramér se hizo con todos los créditos, incluidos los de validación y prueba. Es una fuga menor: las variables se escogieron mirando también el periodo con el que después se evalúa. **[PENDIENTE: repetir la selección solo con entrenamiento o discutirlo.]**
+**Limitación y verificación.** La selección por ANOVA, correlación y V de Cramér se hizo con todos los créditos, incluidos los de validación y prueba. Es una fuga menor: las variables se escogieron mirando también el periodo con el que después se evalúa.
+
+Para medirla, repetimos las mismas pruebas solo con los créditos de entrenamiento (`python scripts/parte1_seleccion_entrenamiento.py`). Con todos los datos, el script reproduce exactamente los valores del notebook. Solo con entrenamiento cambia una variable: `collections_12_mths_ex_med` pasa de $p < 0.001$ a $p = 0.24$ en el ANOVA, y con la misma regla se habría descartado. Todas las demás decisiones se mantienen.
+
+El efecto es nulo. En la importancia por permutación (Sección 3.7), desordenar esa variable no baja el AUC de ninguno de los dos modelos; en la red queda de última entre 20 grupos. Sin ella, el AUC en prueba de la regresión logística pasa de 0.70330 a 0.70332. Por eso conservamos los datos procesados tal como están.
 
 ### 2.4 Análisis descriptivo e hipótesis
 
@@ -298,39 +302,50 @@ $$
 \text{Factor} = \frac{\text{PDO}}{\ln 2}, \qquad \text{Offset} = \text{Puntaje}_0 - \text{Factor}\cdot\ln(\text{Odds}_0), \qquad \text{Puntaje}(p) = \text{Offset} - \text{Factor}\cdot\ln\frac{p}{1-p}.
 $$
 
-Usamos un puntaje base de 600, odds de 50:1 y PDO de 20, los valores que trae el motor. Con ellos, Factor $= 28.8539$ y Offset $= 487.1229$ (Tabla 8). Los tres se cambian con `--puntaje_base`, `--odds_base` y `--pdo`, o en la aplicación.
+Usamos un puntaje base de 600, PDO de 20 y, como odds de referencia, las de la cartera de entrenamiento: $\text{Odds}_0 = N_0/N_1 = 92{,}678/25{,}694 = 3.607$. Así, 600 puntos corresponden a un cliente con la probabilidad de incumplimiento promedio de entrenamiento (21.7 %): por encima de 600 el riesgo es menor que el promedio, y por debajo, mayor. Cada 20 puntos más, las odds de pagar se duplican.
 
-**Tabla 8.** *Puntaje según la probabilidad de incumplimiento (puntaje base 600, odds 50:1, PDO 20).*
+Con estos valores, Factor $= 28.8539$ y Offset $= 562.9841$ (Tabla 8). Los tres parámetros se cambian con `--puntaje_base`, `--odds_base` y `--pdo`, o en la aplicación. Ninguno cambia el AUC, el KS ni el orden de los clientes, porque la transformación es monótona; solo cambian la escala.
+
+Esta elección tiene una consecuencia práctica. Las odds de referencia son exactamente el `pos_weight` de la red, $w = N_0/N_1$, así que $\ln w = \ln \text{Odds}_0$. Entonces la corrección del peso de clase se cancela con el Offset (Sección 7.8), y el puntaje sale directamente del logit de la red, sin corregir:
+
+$$
+\text{Puntaje}(\mathbf{x}) = 600 - 28.8539\cdot f_\theta(\mathbf{x}).
+$$
+
+Lo comprobamos en los 36,378 créditos de prueba: la diferencia máxima con el puntaje calculado desde la probabilidad corregida es de $1.5\times10^{-5}$ puntos.
+
+**Tabla 8.** *Puntaje según la probabilidad de incumplimiento (puntaje base 600 con las odds de la cartera de entrenamiento, PDO 20).*
 
 | Probabilidad de incumplimiento | Odds (buenos : malos) | Puntaje |
 |---|---|---|
-| 1.96 % | 50 : 1 | 600 |
-| 5 % | 19 : 1 | 572 |
-| 10 % | 9 : 1 | 551 |
-| 21.7 % (tasa de entrenamiento) | 3.6 : 1 | 524 |
-| 50 % | 1 : 1 | 487 |
-| 80 % | 0.25 : 1 | 447 |
+| 2 % | 49 : 1 | 675 |
+| 5 % | 19 : 1 | 648 |
+| 10 % | 9 : 1 | 626 |
+| 21.7 % (tasa de entrenamiento) | 3.6 : 1 | 600 |
+| 30 % | 2.3 : 1 | 587 |
+| 50 % | 1 : 1 | 563 |
+| 80 % | 0.25 : 1 | 523 |
 
 *Fuente:* elaboración propia con las fórmulas de `scripts/scorecard_engine.py`.
 
-**Distribución en prueba.** Con la red base, los puntajes de prueba tienen media 526 y desviación estándar 25. El 5 % más bajo queda por debajo de 488, la mediana es 524 y el 5 % más alto supera 570 (Figura 8). Como la cartera tiene una tasa de incumplimiento cercana a 25 % y las odds de referencia son 50:1, casi todos los créditos quedan por debajo del puntaje base. **[PENDIENTE: decidir con el equipo si se mantienen estos parámetros.]**
+**Distribución en prueba.** Con la red base, los puntajes de prueba tienen media 602 y desviación estándar 25. El 5 % más bajo queda por debajo de 564, la mediana es 600 y el 5 % más alto supera 646. El rango va de 526 a 813 (Figura 8).
 
-**¿Ordena bien?** Sí. Al dividir los créditos de prueba en deciles de puntaje, la tasa observada de incumplimiento baja en cada decil: va de 50.0 % en el de menor puntaje a 5.7 % en el de mayor puntaje (Tabla 9). La PD media de la red queda un poco por debajo de la tasa observada en casi todos los deciles, por lo mismo que se ve en la calibración.
+**¿Ordena bien?** Sí. Al dividir los créditos de prueba en deciles de puntaje, la tasa observada de incumplimiento baja en cada decil: va de 49.8 % en el de menor puntaje a 5.6 % en el de mayor puntaje (Tabla 9). La PD media de la red queda un poco por debajo de la tasa observada en casi todos los deciles, por lo mismo que se ve en la calibración.
 
 **Tabla 9.** *Incumplimiento por decil de puntaje en prueba (red base).*
 
 | Decil | Puntaje | PD media | Tasa observada |
 |---|---|---|---|
-| 1 | 450 – 495 | 50.4 % | 50.0 % |
-| 2 | 495 – 504 | 39.4 % | 40.9 % |
-| 3 | 504 – 511 | 33.1 % | 35.1 % |
-| 4 | 511 – 517 | 28.4 % | 29.9 % |
-| 5 | 517 – 524 | 23.9 % | 26.2 % |
-| 6 | 524 – 532 | 19.5 % | 22.3 % |
-| 7 | 532 – 539 | 15.8 % | 16.9 % |
-| 8 | 539 – 548 | 12.6 % | 15.0 % |
-| 9 | 548 – 560 | 9.2 % | 10.3 % |
-| 10 | 560 – 737 | 5.2 % | 5.7 % |
+| 1 | 526 – 570 | 50.4 % | 49.8 % |
+| 2 | 570 – 580 | 39.4 % | 41.3 % |
+| 3 | 580 – 587 | 33.1 % | 34.8 % |
+| 4 | 587 – 593 | 28.4 % | 30.1 % |
+| 5 | 593 – 600 | 23.9 % | 26.2 % |
+| 6 | 600 – 608 | 19.5 % | 22.2 % |
+| 7 | 608 – 615 | 15.8 % | 16.9 % |
+| 8 | 615 – 624 | 12.6 % | 15.2 % |
+| 9 | 624 – 636 | 9.2 % | 10.2 % |
+| 10 | 636 – 813 | 5.2 % | 5.6 % |
 
 *Fuente:* elaboración propia, `python scripts/parte1_evaluacion.py` (`resultados/parte1/deciles_puntaje_prueba.csv`). Cada decil tiene 3,637 o 3,638 créditos.
 
@@ -340,10 +355,10 @@ Usamos un puntaje base de 600, odds de 50:1 y PDO de 20, los valores que trae el
 
 *Fuente:* elaboración propia, `python scripts/parte1_evaluacion.py`.
 
-**Cómo salen los puntos del modelo.** En las dos versiones, el puntaje de un crédito es $\text{Offset} - \text{Factor}\,[f(\mathbf{x}) - \ln w]$, donde $f(\mathbf{x})$ es el logit del modelo y $w = 3.61$. Lo que cambia es cómo se reparte ese puntaje entre las variables.
+**Cómo salen los puntos del modelo.** En las dos versiones, el puntaje de un crédito es $\text{Offset} - \text{Factor}\,[f(\mathbf{x}) - \ln w]$, donde $f(\mathbf{x})$ es el logit del modelo y $w = 3.607$. Lo que cambia es cómo se reparte ese puntaje entre las variables.
 
-- **Logística: scorecard continua exacta.** El logit es una suma, $\beta_0 + \sum_j \beta_j (x_j - \mu_j)/s_j$, donde $\mu_j$ y $s_j$ son la media y la desviación de entrenamiento. Entonces el puntaje es el de un cliente promedio, 528.5 puntos, más los puntos de cada variable, $-\text{Factor}\cdot\beta_j\,(x_j - \mu_j)/s_j$. La Tabla 10 muestra cuántos puntos suma o resta cada unidad de las variables principales. Comprobamos que la suma de los puntos reproduce el puntaje calculado desde la probabilidad, con una diferencia máxima de $10^{-13}$.
-- **Red neuronal: atribución.** El logit de la red no es una suma por variable. Usamos gradientes integrados (Sundararajan et al., 2017), que reparten $f(\mathbf{x}) - f(\mathbf{x}_0)$ entre las variables y cuyas atribuciones suman exactamente esa diferencia (completitud). Como línea base $\mathbf{x}_0$ tomamos el cliente promedio de entrenamiento ($\tilde{\mathbf{x}} = 0$), que tiene 536.9 puntos. Entonces los puntos de cada variable son $-\text{Factor}$ por su atribución. Con 256 pasos de integración, la suma de los puntos difiere del puntaje en 0.03 puntos en promedio y en 0.6 como máximo, en 5,000 créditos de prueba. La Figura 11 muestra un ejemplo, y la aplicación lo calcula para cada solicitante.
+- **Logística: scorecard continua exacta.** El logit es una suma, $\beta_0 + \sum_j \beta_j (x_j - \mu_j)/s_j$, donde $\mu_j$ y $s_j$ son la media y la desviación de entrenamiento. Entonces el puntaje es el de un cliente promedio, 604.3 puntos, más los puntos de cada variable, $-\text{Factor}\cdot\beta_j\,(x_j - \mu_j)/s_j$. La Tabla 10 muestra cuántos puntos suma o resta cada unidad de las variables principales. Comprobamos que la suma de los puntos reproduce el puntaje calculado desde la probabilidad, con una diferencia máxima de $10^{-12}$.
+- **Red neuronal: atribución.** El logit de la red no es una suma por variable. Usamos gradientes integrados (Sundararajan et al., 2017), que reparten $f(\mathbf{x}) - f(\mathbf{x}_0)$ entre las variables y cuyas atribuciones suman exactamente esa diferencia (completitud). Como línea base $\mathbf{x}_0$ tomamos el cliente promedio de entrenamiento ($\tilde{\mathbf{x}} = 0$), que tiene 612.7 puntos. Entonces los puntos de cada variable son $-\text{Factor}$ por su atribución. Con 256 pasos de integración, la suma de los puntos difiere del puntaje en 0.03 puntos en promedio y en 0.6 como máximo, en 5,000 créditos de prueba. La Figura 11 muestra un ejemplo, y la aplicación lo calcula para cada solicitante.
 
 **Tabla 10.** *Puntos de la scorecard continua de la regresión logística.*
 
@@ -465,7 +480,7 @@ En todos los castigados se cumple $EAD > 0$ y `out_prncp` $= 0$. Solo 38 crédit
 
 ### 4.3 Distribución
 
-La LGD tiene media 0.930, mediana 0.981 y desviación estándar 0.098. El **46.4 %** de los castigados tiene LGD $= 1$, es decir, no se recuperó nada (Figura 12). Hay picos: la razón `recoveries / EAD` se concentra cerca de 5.7 % y 14 %, y la razón `collection_recovery_fee / recoveries`, cerca de 1 % y 18 %. Esto sugiere que la LGD depende más de reglas del proceso de recobro que del perfil del cliente. **[PENDIENTE: hipótesis sin verificar con fuentes.]**
+La LGD tiene media 0.930, mediana 0.981 y desviación estándar 0.098. El **46.4 %** de los castigados tiene LGD $= 1$, es decir, no se recuperó nada (Figura 12). Hay picos: la razón `recoveries / EAD` se concentra cerca de 5.7 % y 14 %, y la razón `collection_recovery_fee / recoveries`, cerca de 1 % y 18 %. Esto sugiere que la LGD depende más de reglas del proceso de recobro que del perfil del cliente. Para la comisión hay una explicación documentada: según su centro de ayuda, Lending Club descuenta de lo recuperado comisiones de cobranza que son porcentajes fijos, de hasta 30 % sin litigio y hasta 40 % con litigio, más las que cobran agencias externas cuando el crédito se castiga (LendingClub, s. f.). Para los picos de `recoveries / EAD` no encontramos una fuente; una posibilidad es la venta de carteras castigadas a un precio fijo, pero no la podemos verificar con estos datos. Las políticas actuales pueden diferir de las del periodo 2007-2015.
 
 **Figura 12.** *Distribución de la LGD en los créditos castigados.*
 
@@ -598,7 +613,7 @@ Ningún modelo reproduce la distribución observada (Figura 15). En prueba, el 8
 
 **Conclusión preliminar.** Con variables de originación, la LGD casi no se puede predecir a nivel individual: la correlación de Spearman va de 0.12 a 0.19. Lo que un modelo gana en MAE o RMSE en prueba se debe sobre todo a acertar el nivel de una LGD inflada por el recobro incompleto, no a distinguir entre clientes.
 
-**[PENDIENTE: decidir cómo tratar el recobro incompleto. Opciones de `docs/parte2_lgd.md`: (a) mantener la partición y reportar el sesgo; (b) usar solo cosechas con recobro maduro; (c) seleccionar hiperparámetros con una métrica sin sesgo, como el RMSE sin sesgo o Spearman.]**
+**Cómo lo tratamos.** Mantenemos la misma partición temporal de la Parte 1 y reportamos el sesgo de nivel junto con métricas que no dependen de él: el RMSE sin sesgo y la correlación de Spearman (Tabla 18). Hay otras dos opciones: usar solo las cosechas con recobro maduro, o escoger los hiperparámetros con una métrica sin sesgo. La primera rompería la coherencia con la Parte 1 y con el caso de uso, porque el modelo se aplica a créditos nuevos. Quedan como trabajo futuro.
 
 ### 4.9 Exposición al incumplimiento y pérdida esperada
 
@@ -868,6 +883,14 @@ $$
 
 A mayor probabilidad de incumplimiento, menor puntaje.
 
+Si las odds de referencia son las de la cartera de entrenamiento, $\text{Odds}_0 = N_0/N_1$, coinciden con el peso de clase, $w = N_0/N_1$. Reemplazando $\text{Offset} = \text{Puntaje}_0 - \text{Factor}\cdot\ln w$:
+
+$$
+\text{Puntaje}(\mathbf{x}) = \text{Puntaje}_0 - \text{Factor}\cdot\ln w - \text{Factor}\cdot f_\theta(\mathbf{x}) + \text{Factor}\cdot\ln w = \text{Puntaje}_0 - \text{Factor}\cdot f_\theta(\mathbf{x}).
+$$
+
+Es decir, el puntaje es una función lineal del logit sin corregir, y $f_\theta(\mathbf{x}) = 0$ corresponde exactamente al puntaje base.
+
 ### 7.9 Interpretabilidad
 
 **Importancia por permutación** (Breiman, 2001; Fisher et al., 2019). Sea $G$ un grupo de columnas y $\mathbf{X}^{\pi_G}$ la matriz de prueba con las filas de esas columnas permutadas al azar (la misma permutación para todo el grupo). La importancia del grupo es la caída del AUC, promediada en $R = 5$ permutaciones:
@@ -899,9 +922,9 @@ con $m = 256$ pasos (regla del punto medio). Por el teorema fundamental del cál
 
 ## Referencias
 
-<!-- [PENDIENTE] Verificar cada referencia (autores, año, páginas y DOI) antes de publicar, como en el Trabajo 1. En particular, confirmar el año y la editorial de Siddiqi. Agregar aquí las que se citen en las secciones que faltan. -->
+<!-- Referencias verificadas el 27 de octubre de 2026 contra las páginas de las revistas, PMLR, arXiv, Scopus y catálogos de bibliotecas (autores, año, volumen, número, páginas y DOI). Se corrigió el número de Bergstra y Bengio (2012). Agregar aquí las que se citen en las secciones que faltan. -->
 
-Bergstra, J., & Bengio, Y. (2012). Random search for hyper-parameter optimization. *Journal of Machine Learning Research, 13*, 281–305. https://jmlr.org/papers/v13/bergstra12a.html
+Bergstra, J., & Bengio, Y. (2012). Random search for hyper-parameter optimization. *Journal of Machine Learning Research, 13*(10), 281–305. https://jmlr.org/papers/v13/bergstra12a.html
 
 Breiman, L. (2001). Random forests. *Machine Learning, 45*(1), 5–32. https://doi.org/10.1023/A:1010933404324
 
@@ -915,11 +938,15 @@ Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network 
 
 Kingma, D. P., & Ba, J. (2015). Adam: A method for stochastic optimization. En *3rd International Conference on Learning Representations (ICLR 2015)*. https://arxiv.org/abs/1412.6980
 
+LendingClub. (s. f.). *What investor payments and fees are required?* LendingClub Help Center. Recuperado el 27 de octubre de 2026 de https://help.lendingclub.com/hc/en-us/articles/215480768-What-fees-does-LendingClub-charge-investors-
+
+LendingClub Corporation. (2020). *Prospectus supplement No. 3320* (Formulario 424B3). U.S. Securities and Exchange Commission. https://www.sec.gov/Archives/edgar/data/1409970/000140997020001174/postsup_20200919-055201-0.htm
+
 Loshchilov, I., & Hutter, F. (2019). Decoupled weight decay regularization. En *7th International Conference on Learning Representations (ICLR 2019)*. https://arxiv.org/abs/1711.05101
 
 Papke, L. E., & Wooldridge, J. M. (1996). Econometric methods for fractional response variables with an application to 401(k) plan participation rates. *Journal of Applied Econometrics, 11*(6), 619–632. https://doi.org/10.1002/(SICI)1099-1255(199611)11:6<619::AID-JAE418>3.0.CO;2-1
 
-ranadeep. (s. f.). *Credit risk analysis* [Conjunto de datos]. Kaggle. Recuperado el **[PENDIENTE: fecha de descarga]** de https://www.kaggle.com/datasets/ranadeep/credit-risk-dataset
+ranadeep. (s. f.). *Credit risk analysis* [Conjunto de datos]. Kaggle. Recuperado el 25 de octubre de 2026 de https://www.kaggle.com/datasets/ranadeep/credit-risk-dataset
 
 Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning representations by back-propagating errors. *Nature, 323*(6088), 533–536. https://doi.org/10.1038/323533a0
 

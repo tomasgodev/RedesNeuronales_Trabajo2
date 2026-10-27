@@ -1,0 +1,36 @@
+variable,prueba,valor_todos,valor_entrenamiento,descartada_en_notebook,se_descarta_todos,se_descarta_entrenamiento
+loan_amnt,ANOVA (p),5.442659149529278e-175,1.7697393832103837e-102,False,False,False
+funded_amnt,ANOVA (p),6.127079835801623e-175,2.0048486237695868e-102,True,False,False
+funded_amnt_inv,ANOVA (p),2.518933884154065e-175,9.016644174802942e-103,True,False,False
+int_rate,ANOVA (p),0.0,0.0,False,False,False
+installment,ANOVA (p),1.607436489843233e-101,1.0237590412501141e-47,True,False,False
+annual_inc,ANOVA (p),4.322889644610231e-156,1.0929902520145283e-114,False,False,False
+dti,ANOVA (p),0.0,0.0,False,False,False
+delinq_2yrs,ANOVA (p),2.9259971031458268e-31,3.3338567535747006e-07,False,False,False
+inq_last_6mths,ANOVA (p),2.5788030933094852e-92,4.4090411006177593e-60,False,False,False
+open_acc,ANOVA (p),1.3310186167322329e-14,1.048635138461973e-09,False,False,False
+pub_rec,ANOVA (p),0.9434097722571423,0.6855893024368421,True,True,True
+revol_bal,ANOVA (p),0.0007250258355056713,0.000763072590322029,False,False,False
+revol_util,ANOVA (p),0.0,6.21074892154644e-184,False,False,False
+total_acc,ANOVA (p),1.8861043848901953e-76,1.4829726552707678e-33,False,False,False
+collections_12_mths_ex_med,ANOVA (p),7.116174604059845e-11,0.2371499868010742,False,False,True
+acc_now_delinq,ANOVA (p),2.1325905686197742e-06,0.003845841229913787,False,False,False
+tot_coll_amt,ANOVA (p),0.5652252130063161,0.5697631645360677,True,True,True
+tot_cur_bal,ANOVA (p),3.194150838283448e-248,1.9874226397123638e-139,False,False,False
+total_rev_hi_lim,ANOVA (p),2.197433769339484e-126,2.7888671029413654e-70,True,False,False
+funded_amnt,Pearson con loan_amnt,0.9999964838751885,0.9999939852109471,True,True,True
+funded_amnt_inv,Pearson con loan_amnt,0.9999902902291673,0.9999857600511023,True,True,True
+installment,Pearson con loan_amnt,0.9551342734157203,0.9588798721022264,True,True,True
+total_rev_hi_lim,Pearson con revol_bal,0.8291384485466796,0.8339630765440519,True,True,True
+term,V de Cramér con incumplimiento,0.16308961020730592,0.17092298160345026,False,False,False
+grade,V de Cramér con incumplimiento,0.25435209546790166,0.23965765477595313,True,False,False
+sub_grade,V de Cramér con incumplimiento,0.26075335631188123,0.24743039032110495,False,False,False
+emp_length,V de Cramér con incumplimiento,0.0251246884798039,0.014139671425152558,True,True,True
+home_ownership,V de Cramér con incumplimiento,0.07290939346294663,0.05851015663166155,False,False,False
+verification_status,V de Cramér con incumplimiento,0.07972425889334543,0.07207208381429245,False,False,False
+pymnt_plan,V de Cramér con incumplimiento,0.003211344186624131,0.0,True,True,True
+purpose,V de Cramér con incumplimiento,0.05704101104691844,0.059689983208609396,False,False,False
+addr_state,V de Cramér con incumplimiento,0.05680984746012076,0.05521878616128909,False,False,False
+initial_list_status,V de Cramér con incumplimiento,0.0,0.00987619896979245,True,True,True
+application_type,V de Cramér con incumplimiento,0.0010087720399804322,0.0,True,True,True
+grade,V de Cramér con sub_grade,0.9999274746678422,0.9998817147970651,True,True,True
