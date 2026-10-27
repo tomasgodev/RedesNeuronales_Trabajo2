@@ -52,6 +52,13 @@ Semillas: 56 para la búsqueda, la regresión logística usa `random_state=42`, 
 
 Reproducibilidad entre computadores: `scripts/parte2_lgd.py --busqueda` corrido en macOS (Apple M1) reproduce los resultados que `notebooks/regresion.ipynb` obtuvo en Windows. La configuración ganadora y las 30 semillas de la red final son idénticas (diferencias menores a $10^{-7}$). En 5 de las 30 configuraciones de la búsqueda el RMSE de validación difiere hasta en 0.0006, por diferencias numéricas de PyTorch entre plataformas.
 
+### Pruebas
+
+| Comando | Qué prueba | Tiempo |
+|---|---|---|
+| `python scripts/probar_app.py` | Que la app use los modelos entrenados (mismos pesos, misma PD y LGD que los notebooks, mismas métricas) y que la interfaz no se caiga con valores extremos. | 50 s |
+| `python scripts/probar_robustez.py` | 100 casos que cambian cada parámetro de cada comando, incluidos valores extremos, inválidos y archivos de configuración dañados. Un valor inválido debe terminar con un mensaje claro, nunca con un error de Python. Corre sobre una copia temporal del repositorio. | ≈ 9 min |
+
 ## 4. Aplicación web
 
 ```bash

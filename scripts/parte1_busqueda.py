@@ -32,6 +32,9 @@ from src.modelos import (  # noqa: E402
     entrenar_clasificador, predecir_proba,
 )
 from metricas_clasificacion import calcular_metricas_completas  # noqa: E402  (scripts/metricas_clasificacion.py)
+from src.validacion import (  # noqa: E402
+    entero_no_negativo, entero_positivo, leer_config, no_negativo, revisar, revisar_espacio, salir, tamano_lote,
+)
 
 METRICAS = ["AUC", "Gini", "KS", "Brier"]
 
@@ -41,10 +44,10 @@ def leer_argumentos():
     p.add_argument("--config", default=str(RAIZ / "configs" / "parte1.json"))
     p.add_argument("--demo", action="store_true", help="muestra de entrenamiento y pocas corridas (< 2 min)")
     p.add_argument("--solo_semillas", action="store_true", help="salta la búsqueda y usa la configuración final guardada")
-    p.add_argument("--n_configuraciones", type=int, help="configuraciones aleatorias de la búsqueda")
-    p.add_argument("--n_semillas", type=int, help="semillas de la configuración final")
-    p.add_argument("--epocas", type=int, help="máximo de épocas por entrenamiento")
-    p.add_argument("--semilla", type=int, help="semilla de la búsqueda")
+    p.add_argument("--n_configuraciones", type=entero_no_negativo, help="configuraciones aleatorias de la búsqueda")
+    p.add_argument("--n_semillas", type=entero_positivo, help="semillas de la configuración final")
+    p.add_argument("--epocas", type=entero_positivo, help="máximo de épocas por entrenamiento")
+    p.add_argument("--semilla", type=entero_no_negativo, help="semilla de la búsqueda")
     return p.parse_args()
 
 
@@ -66,7 +69,18 @@ def evaluar(model, X_t, y, pos_weight, nombre):
 
 def main():
     args = leer_argumentos()
-    cfg = json.loads(Path(args.config).read_text())
+    cfg = leer_config(args.config)
+    nombre_cfg, b, base_cfg, demo_cfg = Path(args.config).name, cfg["busqueda"], cfg["modelo_base"], cfg["demo"]
+    revisar([("semilla", cfg["semilla"], entero_no_negativo), ("n_semillas", cfg["n_semillas"], entero_positivo),
+             ("busqueda.n_configuraciones", b["n_configuraciones"], entero_no_negativo),
+             ("busqueda.epocas", b["epocas"], entero_positivo), ("busqueda.paciencia", b["paciencia"], entero_no_negativo),
+             ("modelo_base.lr", base_cfg["lr"], no_negativo), ("modelo_base.weight_decay", base_cfg["weight_decay"], no_negativo),
+             ("modelo_base.batch_size", base_cfg["batch_size"], tamano_lote),
+             ("demo.muestra_entrenamiento", demo_cfg["muestra_entrenamiento"], entero_positivo),
+             ("demo.n_configuraciones", demo_cfg["n_configuraciones"], entero_no_negativo),
+             ("demo.n_semillas", demo_cfg["n_semillas"], entero_positivo), ("demo.epocas", demo_cfg["epocas"], entero_positivo)],
+            nombre_cfg)
+    revisar_espacio(b["espacio"], nombre_cfg)
     semilla = args.semilla if args.semilla is not None else cfg["semilla"]
     n_conf = cfg["busqueda"]["n_configuraciones"]
     n_sem = cfg["n_semillas"]
@@ -84,6 +98,8 @@ def main():
     d = datos_parte1()
     X_train, y_train = d["X_train"], d["y_train"]
     if args.demo:
+        if cfg["demo"]["muestra_entrenamiento"] > len(X_train):
+            salir(f"demo.muestra_entrenamiento ({cfg['demo']['muestra_entrenamiento']}) es mayor que los créditos de entrenamiento ({len(X_train):,})")
         idx = np.random.default_rng(semilla).choice(len(X_train), cfg["demo"]["muestra_entrenamiento"], replace=False)
         X_train, y_train = X_train.iloc[idx], y_train[idx]
     scaler = StandardScaler().fit(X_train)  # ajustado solo con entrenamiento, como en el notebook
@@ -98,6 +114,9 @@ def main():
 
     # 1. Búsqueda aleatoria: la configuración base de Tomás es la candidata 0
     if args.solo_semillas:
+        if not ruta_final.exists():
+            salir(f"no existe {ruta_final.relative_to(RAIZ)}: corra primero la búsqueda (sin --solo_semillas)"
+                  + (" con --demo" if args.demo else ""))
         final = json.loads(ruta_final.read_text())
         print(f"Configuración final leída de {ruta_final}")
     else:

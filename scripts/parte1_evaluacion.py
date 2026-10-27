@@ -43,6 +43,7 @@ from src.modelos import (  # noqa: E402
 )
 from metricas_clasificacion import calcular_metricas_completas, tabla_calibracion_decilica  # noqa: E402
 from scorecard_engine import CreditScorecard  # noqa: E402
+from src.validacion import entero_positivo, leer_config, positivo, revisar  # noqa: E402
 
 SALIDA = RAIZ / "resultados" / "parte1"
 FIGURAS = RAIZ / "blog" / "figuras"
@@ -55,8 +56,8 @@ def leer_argumentos():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--config", default=str(RAIZ / "configs" / "parte1.json"))
     p.add_argument("--puntaje_base", type=float)
-    p.add_argument("--odds_base", type=float)
-    p.add_argument("--pdo", type=float)
+    p.add_argument("--odds_base", type=positivo, help="mayor que 0")
+    p.add_argument("--pdo", type=positivo, help="mayor que 0")
     p.add_argument("--rapido", action="store_true", help="menos repeticiones de permutación y muestra en gradientes integrados")
     return p.parse_args()
 
@@ -118,8 +119,13 @@ def main():
     if args.rapido:  # no sobrescribe los resultados completos ni las figuras del blog
         SALIDA = RAIZ / "resultados" / "demo" / "parte1"
         FIGURAS = RAIZ / "resultados" / "demo" / "figuras"
-    cfg = json.loads(Path(args.config).read_text())
+    cfg = leer_config(args.config)
     sc_cfg = cfg["scorecard"]
+    revisar([("scorecard.pdo", sc_cfg["pdo"], positivo),
+             ("interpretabilidad.repeticiones_permutacion", cfg["interpretabilidad"]["repeticiones_permutacion"], entero_positivo),
+             ("interpretabilidad.pasos_gradientes_integrados", cfg["interpretabilidad"]["pasos_gradientes_integrados"], entero_positivo)]
+            + ([] if sc_cfg["odds_base"] == "cartera" else [("scorecard.odds_base", sc_cfg["odds_base"], positivo)]),
+            Path(args.config).name)
     puntaje_base = args.puntaje_base if args.puntaje_base is not None else sc_cfg["puntaje_base"]
     odds_base = args.odds_base if args.odds_base is not None else sc_cfg["odds_base"]
     pdo = args.pdo if args.pdo is not None else sc_cfg["pdo"]
