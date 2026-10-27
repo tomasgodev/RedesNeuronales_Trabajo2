@@ -13,6 +13,7 @@ import streamlit as st
 sys.path.append(str(Path(__file__).resolve().parent))
 from motor_riesgo import MotorRiesgo  # noqa: E402
 from scorecard_engine import CreditScorecard  # noqa: E402
+from estilos import CIRUELA, aplicar_estilos, encabezado, moneda_puntaje, titulo_seccion  # noqa: E402
 
 # [PENDIENTE] Enlaces definitivos
 ENLACE_REPORTE = ""
@@ -84,24 +85,34 @@ def campo(motor, variable, valor, clave, contenedor):
 def grafica_poblacion(puntajes, puntaje_cliente):
     fig, ax = plt.subplots(figsize=(7, 2.6))
     bins = np.arange(puntajes.min() - 0.5, puntajes.max() + 1.5, 3)
-    ax.hist(puntajes, bins=bins, color="#9aa5b1", alpha=0.8)
-    ax.hist(puntajes[puntajes <= puntaje_cliente], bins=bins, color="#2a6fdb", alpha=0.8)
-    ax.axvline(puntaje_cliente, color="#c0392b", linewidth=2)
+    ax.hist(puntajes, bins=bins, color="#E7DDFB")
+    ax.hist(puntajes[puntajes <= puntaje_cliente], bins=bins, color="#CDB4F6")
+    ax.axvline(puntaje_cliente, color="#E36A78", linewidth=2.5)
     ax.set(xlabel="Puntaje", yticks=[], xlim=(np.percentile(puntajes, 0.5) - 10, np.percentile(puntajes, 99.5) + 10))
-    ax.spines[["top", "right", "left"]].set_visible(False)
-    fig.tight_layout()
-    return fig
+    return estilo_grafica(fig, ax)
 
 
 def grafica_puntos(base, puntos):
     top = puntos.head(10)[::-1]
     fig, ax = plt.subplots(figsize=(7, 4))
-    ax.barh([NOMBRES.get(v, v) for v in top.index], top.values,
-            color=["#2a9d8f" if v > 0 else "#c0392b" for v in top.values])
-    ax.axvline(0, color="k", linewidth=0.8)
+    ax.barh([NOMBRES.get(v, v) for v in top.index], top.values, height=0.62,
+            color=["#7FCFAF" if v > 0 else "#EE7C87" for v in top.values])
+    ax.axvline(0, color=CIRUELA, linewidth=0.8)
     ax.set(xlabel=f"Puntos frente al cliente promedio ({base:.0f} puntos)")
-    ax.grid(axis="x", alpha=0.3)
-    ax.spines[["top", "right"]].set_visible(False)
+    ax.grid(axis="x", color="#E7DDFB")
+    return estilo_grafica(fig, ax)
+
+
+def estilo_grafica(fig, ax):
+    """Fondo transparente, texto ciruela y sin marcos, para que la gráfica se integre al diseño."""
+    fig.patch.set_alpha(0)
+    ax.set_facecolor("none")
+    ax.set_axisbelow(True)
+    for lado in ["top", "right", "left"]:
+        ax.spines[lado].set_visible(False)
+    ax.spines["bottom"].set_color("#CDB4F6")
+    ax.tick_params(colors="#6E5C85", length=0)
+    ax.xaxis.label.set_color("#6E5C85")
     fig.tight_layout()
     return fig
 
@@ -111,18 +122,19 @@ def enlace(texto, url):
 
 
 def main():
-    st.set_page_config(page_title="¿Me prestas? · Riesgo de crédito", page_icon="🏦", layout="wide")
+    st.set_page_config(page_title="¿Me prestas? · Riesgo de crédito", page_icon=":material/savings:", layout="wide")
+    aplicar_estilos()
     motor = cargar_motor()
 
     with st.sidebar:
-        st.markdown("## 🏦 ¿Me prestas?")
+        st.markdown("## ¿Me prestas?")
         st.write("Estima la probabilidad de que un crédito de consumo no se pague, la convierte en un puntaje "
                  "y calcula cuánto podría perder el prestamista. Usa una red neuronal entrenada con créditos "
                  "de Lending Club originados entre 2012 y 2014.")
         st.markdown("### Enlaces")
-        st.markdown(f"- 📝 {enlace('Reporte técnico', ENLACE_REPORTE)}\n"
-                    f"- 🎥 {enlace('Video promocional', ENLACE_VIDEO)}\n"
-                    f"- 💻 {enlace('Repositorio', ENLACE_REPOSITORIO)}")
+        st.markdown(f"- {enlace('Reporte técnico', ENLACE_REPORTE)}\n"
+                    f"- {enlace('Video promocional', ENLACE_VIDEO)}\n"
+                    f"- {enlace('Repositorio', ENLACE_REPOSITORIO)}")
         st.markdown("### Parámetros de la scorecard")
         puntaje_base = st.number_input("Puntaje base", min_value=300, max_value=900, value=600, step=10, key="sc_base")
         odds_base = st.number_input("Odds de referencia (buenos por cada malo)", min_value=0.5, max_value=500.0,
@@ -133,15 +145,16 @@ def main():
                    f"cliente con el riesgo promedio. Cada vez que las odds de pagar se duplican, el puntaje sube PDO puntos.")
     sc = CreditScorecard(score_base=puntaje_base, odds_base=odds_base, pdo=pdo)
 
-    st.title("¿Me prestas?")
-    st.write("Ingresa los datos de la solicitud. El resultado se actualiza solo. Los valores iniciales son los de "
-             "un solicitante típico.")
+    encabezado("¿Me prestas?",
+               "Calcula qué tan probable es que un crédito de consumo no se pague, cuántos puntos saca en la "
+               "scorecard y cuánto podría perder quien presta. Cambia los datos de la solicitud y el resultado se "
+               "actualiza al instante; los valores iniciales son los de un solicitante típico.")
     defecto = motor.cliente_por_defecto()
     col_form, col_res = st.columns([1, 1.15], gap="large")
 
     cliente = {}
     with col_form:
-        st.subheader("1. La solicitud")
+        titulo_seccion(1, "La solicitud")
         for titulo, variables in GRUPOS_FORMULARIO:
             contenedor = st.expander(titulo, expanded=titulo != "Historial de crédito")
             columnas = contenedor.columns(2)
@@ -155,14 +168,10 @@ def main():
 
     r = motor.evaluar(cliente, sc)
     with col_res:
-        st.subheader("2. El resultado")
-        a, b, c = st.columns(3)
-        a.metric("Puntaje", r["puntaje"])
-        b.metric("Probabilidad de incumplimiento", f"{r['pd']:.1%}")
-        c.metric("Percentil", f"{r['percentil']:.0f}")
-        st.caption(f"Este puntaje es mayor o igual que el del {r['percentil']:.0f} % de los créditos de prueba "
-                   "(originados entre noviembre de 2014 y diciembre de 2015). En azul, los créditos con un puntaje "
-                   "menor o igual; en rojo, esta solicitud.")
+        titulo_seccion(2, "El resultado")
+        moneda_puntaje(r["puntaje"], r["pd"], r["percentil"])
+        st.caption("Créditos de prueba (originados entre noviembre de 2014 y diciembre de 2015): en lavanda, los que "
+                   "tienen un puntaje menor o igual; la línea rosa es esta solicitud.")
         st.pyplot(grafica_poblacion(motor.puntajes_poblacion(sc), r["puntaje"]), clear_figure=True)
         d, e, f = st.columns(3)
         d.metric("Pérdida si incumple (LGD)", f"{r['lgd']:.0%}")
@@ -173,10 +182,10 @@ def main():
                    "según el plazo.")
 
     st.divider()
-    st.subheader("3. ¿Por qué ese puntaje?")
+    titulo_seccion(3, "¿Por qué ese puntaje?")
     base, puntos = motor.puntos_por_variable(cliente, sc)
     st.write(f"Un cliente promedio tendría unos **{base:.0f} puntos**. Las barras muestran cuántos puntos suma "
-             "(verde) o resta (rojo) cada característica de esta solicitud frente a ese cliente promedio.")
+             "(menta) o resta (rosa) cada característica de esta solicitud frente a ese cliente promedio.")
     g1, g2 = st.columns([1.3, 1])
     g1.pyplot(grafica_puntos(base, puntos), clear_figure=True)
     g2.caption("Los puntos se calculan con gradientes integrados (Sundararajan et al., 2017): se reparte entre "
@@ -184,7 +193,7 @@ def main():
                "multiplica por el Factor de la scorecard. Su suma da el puntaje antes de redondear.")
 
     st.divider()
-    st.subheader("4. ¿Qué pasaría si cambia algo?")
+    titulo_seccion(4, "¿Qué pasaría si cambia algo?")
     w1, w2 = st.columns([1, 1.3], gap="large")
     with w1:
         variable = st.selectbox("Característica a cambiar", list(NOMBRES), format_func=NOMBRES.get, key="wi_variable")
