@@ -30,8 +30,9 @@
     "random_state": 42
   },
   "scorecard": {
+    "descripcion": "odds_base = 'cartera' usa las odds de la cartera de entrenamiento, N0/N1 = 92,678/25,694 = 3.607: el puntaje base corresponde al cliente promedio. También acepta un número.",
     "puntaje_base": 600,
-    "odds_base": 50,
+    "odds_base": "cartera",
     "pdo": 20
   },
   "interpretabilidad": {
