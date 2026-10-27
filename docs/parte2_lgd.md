@@ -6,7 +6,7 @@ Notas de trabajo de la Parte 2. Código en [`notebooks/regresion.ipynb`](../note
 
 - Fuente: *Credit Risk Analysis* (Kaggle, `ranadeep/credit-risk-dataset`, versión 3), archivo `loan/loan.csv`.
 - 887,379 registros y 74 variables, con créditos originados entre 2007-06 y 2015-12 (`issue_d`).
-- Se parte del archivo original, no de `df_procesado.csv`, porque este último elimina por fuga de datos las columnas con las que se construye la LGD. Esas columnas se usan **solo para construir el objetivo**, nunca como variables de entrada.
+- La variable objetivo se construye desde el archivo original con `construir_objetivos` de [`src/preprocesamiento.py`](../src/preprocesamiento.py). Las columnas de recuperación (`recoveries`, `collection_recovery_fee`, `total_rec_prncp`) se usan **solo para construir el objetivo**, nunca como variables de entrada, porque son fuga de datos.
 
 ## 2. Variable objetivo
 
@@ -68,21 +68,27 @@ Verificaciones: $EAD > 0$ y `out_prncp = 0` en todos los castigados. Solo 38 cas
 
 ## 3. Variables de entrada
 
-- Mismas 29 variables de originación y mismas codificaciones que `procesamiento.ipynb`: ordinales para `grade`, `sub_grade`, `verification_status` y `emp_length`, y one-hot con `drop_first` para las demás categóricas.
-- Al eliminar filas con nulos quedan **33,110** créditos, originados entre 2012-08 y 2015-09. Las variables `tot_cur_bal`, `tot_coll_amt` y `total_rev_hi_lim` no existen para las cosechas anteriores.
-- `pymnt_plan` y `application_type` son constantes en los castigados y se eliminan. Quedan **41 variables**.
-- Escalado a $[-1, 1]$ con mínimo y máximo **de entrenamiento** para no filtrar información de validación y prueba.
-- Datos procesados guardados en `datasets/df_lgd_procesado.csv.gz` (sin escalar, con `id`, `issue_d` y `ead`; `ead` se usa solo en la sección 8, no como variable de entrada).
+Se usa el **preprocesamiento compartido con la Parte 1** ([`src/preprocesamiento.py`](../src/preprocesamiento.py)), con las variables seleccionadas en `notebooks/procesamiento.ipynb` mediante ANOVA, la matriz de correlación de Pearson y la V de Cramér:
+
+- **13 numéricas:** `loan_amnt`, `int_rate`, `annual_inc`, `dti`, `delinq_2yrs`, `inq_last_6mths`, `open_acc`, `revol_bal`, `revol_util`, `total_acc`, `collections_12_mths_ex_med`, `acc_now_delinq` y `tot_cur_bal`.
+- **2 ordinales:** `sub_grade` (A1 = 0 … G5 = 34) y `verification_status` (0 a 2).
+- **One-hot con `drop_first`:** `term`, `home_ownership`, `purpose` y `addr_state`.
+
+En total son **82 variables**. Al eliminar filas con nulos quedan **33,110** créditos castigados, originados entre 2012-08 y 2015-09: las variables `tot_cur_bal`, `tot_coll_amt` y `total_rev_hi_lim` no existen para las cosechas anteriores.
+
+- Algunas columnas *dummy* son constantes en los castigados. Se conservan para que la PD y la LGD usen exactamente la misma entrada; los modelos simplemente no aprenden nada de ellas.
+- Escalado estándar (`StandardScaler`) ajustado **solo con entrenamiento**, igual que en clasificación.
+- Los datos procesados están en `datasets/creditos_procesados.csv.gz` y se generan con `python -m src.preprocesamiento`. Para la Parte 2 se filtran los créditos con `lgd` observada. `ead` se usa solo en la sección 8, nunca como variable de entrada.
 
 ## 4. Partición temporal
 
-Se ordena por `issue_d` y se divide en 70/15/15. Lo más reciente queda en prueba, coherente con un modelo que se aplica a créditos futuros.
+Es la **misma partición que en clasificación**, con fechas fijas definidas en `src/preprocesamiento.py`: validación desde 2014-05 y prueba desde 2014-11. Lo más reciente queda en prueba, coherente con un modelo que se aplica a créditos futuros. Así, la pérdida esperada se puede evaluar en el mismo conjunto de prueba para PD y LGD.
 
 | Conjunto | n | Desde | Hasta | LGD media |
 |---|---:|---|---|---:|
 | Entrenamiento | 22,372 | 2012-08 | 2014-04 | 0.919 |
-| Validación | 5,511 | 2014-05 | 2014-09 | 0.949 |
-| Prueba | 5,227 | 2014-10 | 2015-09 | 0.970 |
+| Validación | 7,112 | 2014-05 | 2014-10 | 0.951 |
+| Prueba | 3,626 | 2014-11 | 2015-09 | 0.975 |
 
 La LGD media sube en validación y prueba por la censura de la sección 2.4. Esto penaliza a cualquier modelo entrenado con cosechas más antiguas.
 
@@ -90,7 +96,7 @@ La LGD media sube en validación y prueba por la censura de la sección 2.4. Est
 
 ### 5.1 Regresión lineal (referencia)
 
-Mínimos cuadrados ordinarios (`sklearn.linear_model.LinearRegression`) con 42 parámetros (41 coeficientes y el intercepto). En prueba ninguna predicción cae fuera de $[0, 1]$, pero el modelo no lo garantiza.
+Mínimos cuadrados ordinarios (`sklearn.linear_model.LinearRegression`) con 83 parámetros (82 coeficientes y el intercepto). En prueba ninguna predicción cae fuera de $[0, 1]$, pero el modelo no lo garantiza.
 
 ### 5.2 Perceptrón multicapa
 
@@ -123,7 +129,7 @@ Mínimos cuadrados ordinarios (`sklearn.linear_model.LinearRegression`) con 42 p
 | Pérdida | BCE, MSE |
 
 - **Criterio de selección:** menor RMSE en validación, igual para todas las configuraciones. Como cada configuración usa su propia pérdida, no se pueden comparar por la pérdida.
-- **Configuración ganadora:** `[64, 32, 16]`, tanh, *dropout* 0.2, `weight_decay` 1e-5, `lr` 3e-4, lote de 512 y pérdida MSE. Tiene **5,537 parámetros**.
+- **Configuración ganadora:** `[64, 32, 16]`, tanh, *dropout* 0.2, `weight_decay` 1e-5, `lr` 3e-4, lote de 512 y pérdida MSE. Tiene **8,161 parámetros**.
 - 8 de las 10 mejores configuraciones usan MSE.
 - Resultados completos en `resultados/busqueda_lgd.csv`. La configuración final está en `resultados/config_final_lgd.json`.
 
@@ -132,8 +138,8 @@ Mínimos cuadrados ordinarios (`sklearn.linear_model.LinearRegression`) con 42 p
 | Modelo | Parámetros | Configuraciones | Tiempo de búsqueda | Tiempo de 30 semillas |
 |---|---:|---:|---:|---:|
 | Media de entrenamiento | 1 | 1 | 0 s | — |
-| Regresión lineal | 42 | 1 | 0.05 s | — (determinista) |
-| MLP | 5,537 | 30 | 5.7 min | 13.6 min |
+| Regresión lineal | 83 | 1 | 0.08 s | — (determinista) |
+| MLP | 8,161 | 30 | 6.0 min | 11.8 min |
 
 ## 7. Resultados
 
@@ -141,10 +147,10 @@ Mínimos cuadrados ordinarios (`sklearn.linear_model.LinearRegression`) con 42 p
 
 | | MAE val | RMSE val | MAE prueba | RMSE prueba |
 |---|---:|---:|---:|---:|
-| Media | 0.0655 | 0.0775 | 0.0618 | 0.0796 |
-| Desv. estándar | 0.0007 | 0.0002 | 0.0012 | 0.0005 |
-| Mejor | 0.0643 | 0.0771 | 0.0598 | 0.0787 |
-| Peor | 0.0675 | 0.0779 | 0.0653 | 0.0811 |
+| Media | 0.0648 | 0.0770 | 0.0594 | 0.0805 |
+| Desv. estándar | 0.0006 | 0.0002 | 0.0014 | 0.0007 |
+| Mejor | 0.0637 | 0.0766 | 0.0571 | 0.0794 |
+| Peor | 0.0658 | 0.0776 | 0.0622 | 0.0820 |
 
 La variabilidad entre semillas es pequeña frente a las diferencias entre modelos. El detalle está en `resultados/semillas_lgd.csv`.
 
@@ -152,14 +158,14 @@ La variabilidad entre semillas es pequeña frente a las diferencias entre modelo
 
 | Modelo | Conjunto | MAE | RMSE | RMSE sin sesgo | Sesgo | Spearman |
 |---|---|---:|---:|---:|---:|---:|
-| Media de entrenamiento | val | 0.0770 | 0.0834 | 0.0776 | −0.0306 | — |
-| | prueba | 0.0814 | 0.0919 | 0.0765 | −0.0509 | — |
-| Regresión lineal | entrenamiento | 0.0731 | 0.0910 | 0.0910 | 0.0000 | **0.199** |
-| | val | 0.0716 | 0.0801 | 0.0771 | −0.0215 | **0.154** |
-| | prueba | 0.0740 | 0.0878 | 0.0773 | −0.0418 | **0.140** |
-| MLP | entrenamiento | 0.0744 | 0.0948 | 0.0913 | +0.0255 | 0.169 |
-| | val | **0.0657** | **0.0772** | 0.0771 | −0.0017 | 0.152 |
-| | prueba | **0.0630** | **0.0800** | 0.0766 | −0.0232 | 0.106 |
+| Media de entrenamiento | val | 0.0773 | 0.0837 | 0.0772 | −0.0324 | — |
+| | prueba | 0.0827 | 0.0950 | 0.0764 | −0.0565 | — |
+| Regresión lineal | entrenamiento | 0.0734 | 0.0909 | 0.0909 | 0.0000 | **0.194** |
+| | val | 0.0738 | 0.0815 | 0.0767 | −0.0275 | **0.148** |
+| | prueba | 0.0775 | 0.0926 | 0.0773 | −0.0510 | **0.133** |
+| MLP | entrenamiento | 0.0752 | 0.0965 | 0.0911 | +0.0317 | 0.145 |
+| | val | **0.0645** | **0.0765** | 0.0765 | −0.0004 | 0.136 |
+| | prueba | **0.0594** | **0.0802** | 0.0762 | −0.0251 | 0.117 |
 
 - **Sesgo** = media de la predicción − media observada.
 - **RMSE sin sesgo** = RMSE después de quitar a ambas series su media, es decir, el error que no se debe al nivel.
@@ -167,21 +173,21 @@ La variabilidad entre semillas es pequeña frente a las diferencias entre modelo
 
 ### 7.3 Diagnóstico: la ventaja del MLP es de nivel, no de información
 
-En MAE y RMSE el MLP gana: en prueba su RMSE es 0.0800 frente a 0.0878 de la regresión lineal. Pero:
+En MAE y RMSE el MLP gana: en prueba su RMSE es 0.0802 frente a 0.0926 de la regresión lineal. Pero:
 
-1. **Quitando el sesgo de nivel, los dos modelos empatan** (RMSE sin sesgo de 0.0766 frente a 0.0773 en prueba).
-2. **La regresión lineal ordena mejor** los créditos en los tres conjuntos (Spearman de 0.140 frente a 0.106 en prueba).
-3. **El MLP está sesgado hacia arriba en su propio conjunto de entrenamiento** (+0.026). La figura de LGD por trimestre lo muestra: su curva queda por encima de la observada durante todo el periodo de entrenamiento y es casi plana.
+1. **Quitando el sesgo de nivel, los dos modelos empatan** (RMSE sin sesgo de 0.0762 frente a 0.0773 en prueba).
+2. **La regresión lineal ordena mejor** los créditos en los tres conjuntos (Spearman de 0.133 frente a 0.117 en prueba).
+3. **El MLP está sesgado hacia arriba en su propio conjunto de entrenamiento** (+0.032). La figura de LGD por trimestre lo muestra: su curva queda por encima de la observada durante todo el periodo de entrenamiento y es casi plana.
 4. **La explicación está en la censura.** La LGD observada sube en validación y prueba porque el recobro de las cosechas recientes no ha terminado. La búsqueda y la parada temprana eligen según el RMSE de validación, así que **premian los modelos cuyo nivel se acerca al de validación**. No premian a los que entienden mejor al cliente. El MLP se beneficia porque, al ser más flexible, su nivel depende más de los hiperparámetros y de la época de parada.
-5. **Ningún modelo reproduce la distribución observada.** En prueba, el 81 % de los créditos tiene LGD = 1 exacta. Las predicciones se concentran en un rango estrecho (0.90–0.96 la lineal, 0.93–0.96 el MLP), con desviación estándar de 0.018 y 0.010 frente a 0.077 observada. Es el comportamiento esperado de un estimador de la media condicional cuando las variables explican poco.
+5. **Ningún modelo reproduce la distribución observada.** En prueba, el 86 % de los créditos tiene LGD = 1 exacta. Las predicciones se concentran en un rango estrecho (0.90–0.95 la lineal, 0.93–0.96 el MLP), con desviación estándar de 0.018 y 0.010 frente a 0.076 observada. Es el comportamiento esperado de un estimador de la media condicional cuando las variables explican poco.
 
-**Conclusión preliminar:** con variables de originación, la LGD es casi impredecible a nivel individual (Spearman de 0.10 a 0.20). Lo que un modelo gana en MAE o RMSE en prueba se debe sobre todo a acertar el **nivel** de una LGD inflada por la censura, no a discriminar entre clientes.
+**Conclusión preliminar:** con variables de originación, la LGD es casi impredecible a nivel individual (Spearman de 0.12 a 0.19). Lo que un modelo gana en MAE o RMSE en prueba se debe sobre todo a acertar el **nivel** de una LGD inflada por la censura, no a discriminar entre clientes.
 
 ## 8. Exposición al incumplimiento (EAD) y pérdida esperada
 
-**Definición de EAD al originar.** En el momento de la solicitud no se sabe cuándo incumplirá el cliente, así que se estima la fracción del monto que suele quedar pendiente al castigo, por plazo, con los castigados de entrenamiento:
+**Definición de EAD al originar.** En el momento de la solicitud no se sabe cuándo incumplirá el cliente, así que se estima la fracción del monto que suele quedar pendiente al castigo, por plazo, con los castigados de entrenamiento. Se usa `loan_amnt` porque el equipo lo conservó como variable de entrada (descartó `funded_amnt` por redundante) y porque es el monto que el usuario ingresará en la aplicación. Ambos coinciden en todos los créditos procesados salvo uno de cada ~33,000:
 
-$$\widehat{EAD}_i = \text{funded\_amnt}_i \cdot \bar{f}_{\text{plazo}(i)}, \qquad \bar{f}_{\text{plazo}} = \text{media}\left(\frac{\text{funded\_amnt} - \text{total\_rec\_prncp}}{\text{funded\_amnt}}\right)$$
+$$\widehat{EAD}_i = \text{loan\_amnt}_i \cdot \bar{f}_{\text{plazo}(i)}, \qquad \bar{f}_{\text{plazo}} = \text{media}\left(\frac{\text{funded\_amnt} - \text{total\_rec\_prncp}}{\text{loan\_amnt}}\right)$$
 
 | Plazo | $\bar{f}$ |
 |---|---:|
@@ -194,12 +200,12 @@ Los créditos a 60 meses amortizan más despacio, así que al incumplir deben un
 
 | | Total (USD) | Promedio por crédito (USD) |
 |---|---:|---:|
-| Pérdida observada ($LGD \cdot EAD$ reales) | 71,196,347 | 13,621 |
-| Pérdida estimada (MLP y $\widehat{EAD}$) | 57,736,333 | 11,046 |
+| Pérdida observada ($LGD \cdot EAD$ reales) | 50,758,058 | 13,998 |
+| Pérdida estimada (MLP y $\widehat{EAD}$) | 40,612,518 | 11,200 |
 
-La subestimación del 19 % se explica por la LGD de prueba inflada por la censura y por usar un factor de EAD promedio.
+La subestimación del 20 % se explica por la LGD de prueba inflada por la censura y por usar un factor de EAD promedio.
 
-**Pérdida esperada:** $E[L]_i = PD_i \cdot \widehat{LGD}_i \cdot \widehat{EAD}_i$. La función `perdida_esperada` del notebook está lista. Falta conectarla con la **PD del modelo de clasificación**, que hoy usa un preprocesamiento distinto (escalado con todos los datos, sin `id`).
+**Pérdida esperada:** $E[L]_i = PD_i \cdot \widehat{LGD}_i \cdot \widehat{EAD}_i$. La función `perdida_esperada` del notebook está lista. Como la PD y la LGD ya comparten preprocesamiento, `id` y partición, falta conectarla con el modelo de clasificación guardado (`weights/modelo_clasificador.pth` y `weights/preprocesamiento_clasificador.joblib`).
 
 ## 9. Pendientes
 
@@ -207,11 +213,12 @@ La subestimación del 19 % se explica por la LGD de prueba inflada por la censur
 - [x] 30 semillas de la configuración final.
 - [x] Comparación de distribuciones.
 - [x] Definición de EAD.
+- [x] Preprocesamiento compartido con la Parte 1 (`src/preprocesamiento.py`).
 - [ ] Decidir cómo tratar la censura (sección 7.3). Opciones:
   - (a) mantener la partición actual y reportar el sesgo;
   - (b) limitar la muestra a cosechas con recobro maduro;
   - (c) seleccionar hiperparámetros con una métrica sin sesgo, como el RMSE sin sesgo o Spearman.
-- [ ] Calcular $E[L]$ con la PD de clasificación (requiere preprocesamiento compartido y conservar `id`).
+- [ ] Calcular $E[L]$ con la PD del modelo de clasificación.
 - [ ] Mover `CONFIG` a un archivo de configuración y lanzar el experimento con un solo comando.
 - [ ] Verificar con fuentes la hipótesis de las ventas de cartera (2.3).
 
