@@ -35,6 +35,8 @@ class MotorRiesgo:
         self.red, self.scaler, self.columnas = cargar_clasificador()
         self.pos_weight = calcular_pos_weight(d["y_train"])
         self.ln_w = float(torch.log(self.pos_weight))
+        # Odds de la cartera de entrenamiento (N0/N1): con ellas, el puntaje base es el cliente promedio
+        self.odds_cartera = float((d["y_train"] == 0).sum() / (d["y_train"] == 1).sum())
         self.modelo_lgd, self.scaler_lgd, self.columnas_lgd, _ = cargar_modelo_lgd()
         self.factor_ead = cargar_factor_ead()
         self.opciones = json.loads((RAIZ / "app" / "opciones_app.json").read_text())

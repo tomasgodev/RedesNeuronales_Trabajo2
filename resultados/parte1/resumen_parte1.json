@@ -1,29 +1,29 @@
 {
   "pos_weight": 3.607,
   "ln_pos_weight": 1.2829,
-  "segundos_regresion_logistica": 0.28,
+  "segundos_regresion_logistica": 0.27,
   "parametros_regresion_logistica": 83,
   "scorecard": {
     "score_base": 600.0,
-    "odds_base": 50.0,
+    "odds_base": 3.6069899587452325,
     "pdo": 20.0,
     "factor": 28.8539,
-    "offset": 487.1229,
-    "puntaje_cliente_promedio_logistica": 528.47,
-    "puntaje_linea_base_red": 536.88
+    "offset": 562.9841,
+    "puntaje_cliente_promedio_logistica": 604.33,
+    "puntaje_linea_base_red": 612.74
   },
   "puntajes_prueba_red": {
-    "media": 526.1,
+    "media": 601.9,
     "desv": 25.2,
-    "min": 450,
-    "max": 737,
-    "p1": 478.0,
-    "p5": 488.0,
-    "p25": 507.0,
-    "p50": 524.0,
-    "p75": 543.0,
-    "p95": 570.0,
-    "p99": 587.0
+    "min": 526,
+    "max": 813,
+    "p1": 554.0,
+    "p5": 564.0,
+    "p25": 583.0,
+    "p50": 600.0,
+    "p75": 619.0,
+    "p95": 646.0,
+    "p99": 663.0
   },
   "gradientes_integrados": {
     "creditos": 5000,
@@ -32,5 +32,5 @@
     "error_completitud_medio": 0.00118,
     "error_completitud_max": 0.01936
   },
-  "segundos_total": 8.5
+  "segundos_total": 8.7
 }

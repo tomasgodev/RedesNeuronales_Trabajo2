@@ -36,7 +36,7 @@ Estimamos con perceptrones multicapa dos cantidades de créditos de consumo de L
 
 Con 193,050 créditos originados entre 2012 y 2015, la red final de PD alcanza un AUC de 0.703 en prueba (media de 30 semillas), igual al de la regresión logística (0.703); la mejor configuración de una búsqueda de 31 llega a 0.704. Después de corregir el efecto del peso de clase, ambos modelos quedan bien calibrados. En LGD, la red tiene menor RMSE que la regresión lineal (0.081 frente a 0.093), pero esa ventaja viene de acertar el nivel de una LGD inflada por el recobro incompleto: la regresión lineal ordena mejor a los clientes.
 
-Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ordena el riesgo: el incumplimiento va de 50 % en el decil de menor puntaje a 5.7 % en el de mayor puntaje. Explicamos cuántos puntos aporta cada variable y estimamos una pérdida esperada de 18.7 % del monto en el periodo de prueba. Cada experimento se reproduce con un solo comando, y la aplicación web permite a cualquier persona calcular su puntaje y ver cómo cambiaría.
+Convertimos la PD en una scorecard en la que 600 puntos corresponden al cliente promedio y cada 20 puntos duplican las odds de pagar. La scorecard ordena el riesgo: el incumplimiento va de 49.8 % en el decil de menor puntaje a 5.6 % en el de mayor puntaje. Explicamos cuántos puntos aporta cada variable y estimamos una pérdida esperada de 18.7 % del monto en el periodo de prueba. Cada experimento se reproduce con un solo comando, y la aplicación web permite a cualquier persona calcular su puntaje y ver cómo cambiaría.
 
 ---
 
@@ -302,39 +302,50 @@ $$
 \text{Factor} = \frac{\text{PDO}}{\ln 2}, \qquad \text{Offset} = \text{Puntaje}_0 - \text{Factor}\cdot\ln(\text{Odds}_0), \qquad \text{Puntaje}(p) = \text{Offset} - \text{Factor}\cdot\ln\frac{p}{1-p}.
 $$
 
-Usamos un puntaje base de 600, odds de 50:1 y PDO de 20, los valores que trae el motor. Con ellos, Factor $= 28.8539$ y Offset $= 487.1229$ (Tabla 8). Los tres se cambian con `--puntaje_base`, `--odds_base` y `--pdo`, o en la aplicación.
+Usamos un puntaje base de 600, PDO de 20 y, como odds de referencia, las de la cartera de entrenamiento: $\text{Odds}_0 = N_0/N_1 = 92{,}678/25{,}694 = 3.607$. Así, 600 puntos corresponden a un cliente con la probabilidad de incumplimiento promedio de entrenamiento (21.7 %): por encima de 600 el riesgo es menor que el promedio, y por debajo, mayor. Cada 20 puntos más, las odds de pagar se duplican.
 
-**Tabla 8.** *Puntaje según la probabilidad de incumplimiento (puntaje base 600, odds 50:1, PDO 20).*
+Con estos valores, Factor $= 28.8539$ y Offset $= 562.9841$ (Tabla 8). Los tres parámetros se cambian con `--puntaje_base`, `--odds_base` y `--pdo`, o en la aplicación. Ninguno cambia el AUC, el KS ni el orden de los clientes, porque la transformación es monótona; solo cambian la escala.
+
+Esta elección tiene una consecuencia práctica. Las odds de referencia son exactamente el `pos_weight` de la red, $w = N_0/N_1$, así que $\ln w = \ln \text{Odds}_0$. Entonces la corrección del peso de clase se cancela con el Offset (Sección 7.8), y el puntaje sale directamente del logit de la red, sin corregir:
+
+$$
+\text{Puntaje}(\mathbf{x}) = 600 - 28.8539\cdot f_\theta(\mathbf{x}).
+$$
+
+Lo comprobamos en los 36,378 créditos de prueba: la diferencia máxima con el puntaje calculado desde la probabilidad corregida es de $1.5\times10^{-5}$ puntos.
+
+**Tabla 8.** *Puntaje según la probabilidad de incumplimiento (puntaje base 600 con las odds de la cartera de entrenamiento, PDO 20).*
 
 | Probabilidad de incumplimiento | Odds (buenos : malos) | Puntaje |
 |---|---|---|
-| 1.96 % | 50 : 1 | 600 |
-| 5 % | 19 : 1 | 572 |
-| 10 % | 9 : 1 | 551 |
-| 21.7 % (tasa de entrenamiento) | 3.6 : 1 | 524 |
-| 50 % | 1 : 1 | 487 |
-| 80 % | 0.25 : 1 | 447 |
+| 2 % | 49 : 1 | 675 |
+| 5 % | 19 : 1 | 648 |
+| 10 % | 9 : 1 | 626 |
+| 21.7 % (tasa de entrenamiento) | 3.6 : 1 | 600 |
+| 30 % | 2.3 : 1 | 587 |
+| 50 % | 1 : 1 | 563 |
+| 80 % | 0.25 : 1 | 523 |
 
 *Fuente:* elaboración propia con las fórmulas de `scripts/scorecard_engine.py`.
 
-**Distribución en prueba.** Con la red base, los puntajes de prueba tienen media 526 y desviación estándar 25. El 5 % más bajo queda por debajo de 488, la mediana es 524 y el 5 % más alto supera 570 (Figura 8). Como la cartera tiene una tasa de incumplimiento cercana a 25 % y las odds de referencia son 50:1, casi todos los créditos quedan por debajo del puntaje base. **[PENDIENTE: decidir con el equipo si se mantienen estos parámetros.]**
+**Distribución en prueba.** Con la red base, los puntajes de prueba tienen media 602 y desviación estándar 25. El 5 % más bajo queda por debajo de 564, la mediana es 600 y el 5 % más alto supera 646. El rango va de 526 a 813 (Figura 8).
 
-**¿Ordena bien?** Sí. Al dividir los créditos de prueba en deciles de puntaje, la tasa observada de incumplimiento baja en cada decil: va de 50.0 % en el de menor puntaje a 5.7 % en el de mayor puntaje (Tabla 9). La PD media de la red queda un poco por debajo de la tasa observada en casi todos los deciles, por lo mismo que se ve en la calibración.
+**¿Ordena bien?** Sí. Al dividir los créditos de prueba en deciles de puntaje, la tasa observada de incumplimiento baja en cada decil: va de 49.8 % en el de menor puntaje a 5.6 % en el de mayor puntaje (Tabla 9). La PD media de la red queda un poco por debajo de la tasa observada en casi todos los deciles, por lo mismo que se ve en la calibración.
 
 **Tabla 9.** *Incumplimiento por decil de puntaje en prueba (red base).*
 
 | Decil | Puntaje | PD media | Tasa observada |
 |---|---|---|---|
-| 1 | 450 – 495 | 50.4 % | 50.0 % |
-| 2 | 495 – 504 | 39.4 % | 40.9 % |
-| 3 | 504 – 511 | 33.1 % | 35.1 % |
-| 4 | 511 – 517 | 28.4 % | 29.9 % |
-| 5 | 517 – 524 | 23.9 % | 26.2 % |
-| 6 | 524 – 532 | 19.5 % | 22.3 % |
-| 7 | 532 – 539 | 15.8 % | 16.9 % |
-| 8 | 539 – 548 | 12.6 % | 15.0 % |
-| 9 | 548 – 560 | 9.2 % | 10.3 % |
-| 10 | 560 – 737 | 5.2 % | 5.7 % |
+| 1 | 526 – 570 | 50.4 % | 49.8 % |
+| 2 | 570 – 580 | 39.4 % | 41.3 % |
+| 3 | 580 – 587 | 33.1 % | 34.8 % |
+| 4 | 587 – 593 | 28.4 % | 30.1 % |
+| 5 | 593 – 600 | 23.9 % | 26.2 % |
+| 6 | 600 – 608 | 19.5 % | 22.2 % |
+| 7 | 608 – 615 | 15.8 % | 16.9 % |
+| 8 | 615 – 624 | 12.6 % | 15.2 % |
+| 9 | 624 – 636 | 9.2 % | 10.2 % |
+| 10 | 636 – 813 | 5.2 % | 5.6 % |
 
 *Fuente:* elaboración propia, `python scripts/parte1_evaluacion.py` (`resultados/parte1/deciles_puntaje_prueba.csv`). Cada decil tiene 3,637 o 3,638 créditos.
 
@@ -344,10 +355,10 @@ Usamos un puntaje base de 600, odds de 50:1 y PDO de 20, los valores que trae el
 
 *Fuente:* elaboración propia, `python scripts/parte1_evaluacion.py`.
 
-**Cómo salen los puntos del modelo.** En las dos versiones, el puntaje de un crédito es $\text{Offset} - \text{Factor}\,[f(\mathbf{x}) - \ln w]$, donde $f(\mathbf{x})$ es el logit del modelo y $w = 3.61$. Lo que cambia es cómo se reparte ese puntaje entre las variables.
+**Cómo salen los puntos del modelo.** En las dos versiones, el puntaje de un crédito es $\text{Offset} - \text{Factor}\,[f(\mathbf{x}) - \ln w]$, donde $f(\mathbf{x})$ es el logit del modelo y $w = 3.607$. Lo que cambia es cómo se reparte ese puntaje entre las variables.
 
-- **Logística: scorecard continua exacta.** El logit es una suma, $\beta_0 + \sum_j \beta_j (x_j - \mu_j)/s_j$, donde $\mu_j$ y $s_j$ son la media y la desviación de entrenamiento. Entonces el puntaje es el de un cliente promedio, 528.5 puntos, más los puntos de cada variable, $-\text{Factor}\cdot\beta_j\,(x_j - \mu_j)/s_j$. La Tabla 10 muestra cuántos puntos suma o resta cada unidad de las variables principales. Comprobamos que la suma de los puntos reproduce el puntaje calculado desde la probabilidad, con una diferencia máxima de $10^{-13}$.
-- **Red neuronal: atribución.** El logit de la red no es una suma por variable. Usamos gradientes integrados (Sundararajan et al., 2017), que reparten $f(\mathbf{x}) - f(\mathbf{x}_0)$ entre las variables y cuyas atribuciones suman exactamente esa diferencia (completitud). Como línea base $\mathbf{x}_0$ tomamos el cliente promedio de entrenamiento ($\tilde{\mathbf{x}} = 0$), que tiene 536.9 puntos. Entonces los puntos de cada variable son $-\text{Factor}$ por su atribución. Con 256 pasos de integración, la suma de los puntos difiere del puntaje en 0.03 puntos en promedio y en 0.6 como máximo, en 5,000 créditos de prueba. La Figura 11 muestra un ejemplo, y la aplicación lo calcula para cada solicitante.
+- **Logística: scorecard continua exacta.** El logit es una suma, $\beta_0 + \sum_j \beta_j (x_j - \mu_j)/s_j$, donde $\mu_j$ y $s_j$ son la media y la desviación de entrenamiento. Entonces el puntaje es el de un cliente promedio, 604.3 puntos, más los puntos de cada variable, $-\text{Factor}\cdot\beta_j\,(x_j - \mu_j)/s_j$. La Tabla 10 muestra cuántos puntos suma o resta cada unidad de las variables principales. Comprobamos que la suma de los puntos reproduce el puntaje calculado desde la probabilidad, con una diferencia máxima de $10^{-12}$.
+- **Red neuronal: atribución.** El logit de la red no es una suma por variable. Usamos gradientes integrados (Sundararajan et al., 2017), que reparten $f(\mathbf{x}) - f(\mathbf{x}_0)$ entre las variables y cuyas atribuciones suman exactamente esa diferencia (completitud). Como línea base $\mathbf{x}_0$ tomamos el cliente promedio de entrenamiento ($\tilde{\mathbf{x}} = 0$), que tiene 612.7 puntos. Entonces los puntos de cada variable son $-\text{Factor}$ por su atribución. Con 256 pasos de integración, la suma de los puntos difiere del puntaje en 0.03 puntos en promedio y en 0.6 como máximo, en 5,000 créditos de prueba. La Figura 11 muestra un ejemplo, y la aplicación lo calcula para cada solicitante.
 
 **Tabla 10.** *Puntos de la scorecard continua de la regresión logística.*
 
@@ -871,6 +882,14 @@ $$
 $$
 
 A mayor probabilidad de incumplimiento, menor puntaje.
+
+Si las odds de referencia son las de la cartera de entrenamiento, $\text{Odds}_0 = N_0/N_1$, coinciden con el peso de clase, $w = N_0/N_1$. Reemplazando $\text{Offset} = \text{Puntaje}_0 - \text{Factor}\cdot\ln w$:
+
+$$
+\text{Puntaje}(\mathbf{x}) = \text{Puntaje}_0 - \text{Factor}\cdot\ln w - \text{Factor}\cdot f_\theta(\mathbf{x}) + \text{Factor}\cdot\ln w = \text{Puntaje}_0 - \text{Factor}\cdot f_\theta(\mathbf{x}).
+$$
+
+Es decir, el puntaje es una función lineal del logit sin corregir, y $f_\theta(\mathbf{x}) = 0$ corresponde exactamente al puntaje base.
 
 ### 7.9 Interpretabilidad
 
