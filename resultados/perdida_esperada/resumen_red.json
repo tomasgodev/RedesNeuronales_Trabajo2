@@ -1,0 +1,16 @@
+{
+  "modelo_pd": "red",
+  "creditos": 36378,
+  "monto_total": 537785700.0,
+  "pd_media": 0.2374,
+  "tasa_incumplimiento_observada": 0.2522,
+  "lgd_media_predicha": 0.9507,
+  "ead_media_estimada": 11040.0,
+  "perdida_esperada_total": 100526044.0,
+  "perdida_esperada_media": 2763.0,
+  "perdida_esperada_sobre_monto": 0.1869,
+  "perdida_observada_castigados_total": 50758058.0,
+  "creditos_castigados": 3626,
+  "creditos_incumplidos_sin_perdida_observada": 5549,
+  "monto_incumplidos_sin_perdida_observada": 88019800.0
+}
