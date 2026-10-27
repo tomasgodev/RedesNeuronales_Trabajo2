@@ -1,0 +1,26 @@
+{
+  "red_reentrenada": {
+    "config": {
+      "capas_ocultas": [
+        64,
+        32,
+        16
+      ],
+      "activacion": "tanh",
+      "dropout": 0.2,
+      "weight_decay": 1e-05,
+      "lr": 0.0003,
+      "batch_size": 512,
+      "perdida": "mse",
+      "epocas": 100,
+      "paciencia": 10
+    },
+    "semilla": 56,
+    "parametros": 8161,
+    "epocas": 100,
+    "MAE_val": 0.0645,
+    "RMSE_val": 0.0765,
+    "MAE_test": 0.0594,
+    "RMSE_test": 0.0802
+  }
+}

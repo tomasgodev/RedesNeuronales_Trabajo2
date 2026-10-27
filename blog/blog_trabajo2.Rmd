@@ -423,7 +423,7 @@ En los gradientes integrados, `addr_state` aparece con más puntos que en la per
 
 ## 4. Parte 2: pérdida dado incumplimiento
 
-El detalle de esta parte está en `docs/parte2_lgd.md` y el código, en `notebooks/regresion.ipynb`.
+El detalle de esta parte está en `docs/parte2_lgd.md` y el código, en `notebooks/regresion.ipynb`. `python scripts/parte2_lgd.py` reproduce el notebook con un solo comando y sin internet: mismas funciones, misma configuración y mismos resultados, incluida la red reentrenada con la semilla 56.
 
 ### 4.1 Qué créditos entran
 
@@ -436,7 +436,7 @@ El detalle de esta parte está en `docs/parte2_lgd.md` y el código, en `noteboo
 | Default | 1,219 | 0.00 | 11,595 |
 | Late (31-120 days) | 11,591 | 0.00 | 11,690 |
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 4).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py --descriptivo` (celda 4 de `notebooks/regresion.ipynb`).
 
 `Default` y `Late (31-120 days)` todavía no se han castigado (Tabla 12): no tienen recuperaciones y aún deben capital, así que su pérdida final no es observable. Si se incluyeran, todos saldrían con pérdida total. El modelo se entrena solo con los **46,009 castigados**. Como estima la pérdida *si* el crédito incumpliera, después se puede aplicar a cualquier crédito.
 
@@ -471,7 +471,7 @@ La LGD tiene media 0.930, mediana 0.981 y desviación estándar 0.098. El **46.4
 
 ![Distribución de la LGD](figuras/fig05_distribucion_lgd.png)
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 6).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py --descriptivo` (celda 6 de `notebooks/regresion.ipynb`).
 
 **Tabla 14.** *LGD por año de originación.*
 
@@ -487,7 +487,7 @@ La LGD tiene media 0.930, mediana 0.981 y desviación estándar 0.098. El **46.4
 | 2014 | 13,981 | 0.945 | 62.7 |
 | 2015 | 2,773 | 0.981 | 89.0 |
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 8).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py --descriptivo` (celda 8 de `notebooks/regresion.ipynb`).
 
 ### 4.4 Limitaciones de la LGD observada
 
@@ -509,7 +509,7 @@ Se usan las mismas 82 variables y los mismos cortes de la Parte 1. Al quitar las
 | Validación | 2014-05 | 2014-10 | 7,112 | 0.951 |
 | Prueba | 2014-11 | 2015-09 | 3,626 | 0.975 |
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 10).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py` (celda 10 de `notebooks/regresion.ipynb`).
 
 La LGD media sube en validación y prueba por el recobro incompleto (Sección 4.4). Esto penaliza a cualquier modelo entrenado con cosechas más antiguas.
 
@@ -533,7 +533,7 @@ La LGD media sube en validación y prueba por el recobro incompleto (Sección 4.
 | Tamaño de lote | 256, 512, 1024 |
 | Pérdida | Entropía cruzada, error cuadrático medio |
 
-*Fuente:* `notebooks/regresion.ipynb` (celda 2); resultados en `resultados/busqueda_lgd.csv`.
+*Fuente:* `python scripts/parte2_lgd.py --busqueda` (celda 2 de `notebooks/regresion.ipynb`); resultados en `resultados/busqueda_lgd.csv`.
 
 La configuración ganadora tiene capas [64, 32, 16], tanh, *dropout* de 0.2, `weight_decay` de $10^{-5}$, tasa de aprendizaje de $3\cdot10^{-4}$, lotes de 512 y error cuadrático medio. Tiene **8,161 parámetros** y está guardada en `resultados/config_final_lgd.json`. Ocho de las diez mejores configuraciones usan el error cuadrático medio. La Figura 13 muestra sus curvas de entrenamiento. Que la pérdida de validación quede por debajo de la de entrenamiento no es un error: la LGD de validación está más concentrada cerca de 1, así que tiene menos varianza.
 
@@ -541,7 +541,7 @@ La configuración ganadora tiene capas [64, 32, 16], tanh, *dropout* de 0.2, `we
 
 ![Curvas de la red de LGD](figuras/fig06_curvas_mlp_lgd.png)
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 25).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py` (celda 25 de `notebooks/regresion.ipynb`).
 
 ### 4.7 Resultados
 
@@ -556,7 +556,7 @@ La configuración final se entrenó con 30 semillas. La variabilidad entre semil
 | Mejor | 0.0637 | 0.0766 | 0.0571 | 0.0794 |
 | Peor | 0.0658 | 0.0776 | 0.0622 | 0.0820 |
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 22); detalle en `resultados/semillas_lgd.csv`.
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py --busqueda` (celda 22 de `notebooks/regresion.ipynb`); detalle en `resultados/semillas_lgd.csv`.
 
 **Tabla 18.** *Comparación de modelos de LGD (red con semilla 56).*
 
@@ -571,7 +571,7 @@ La configuración final se entrenó con 30 semillas. La variabilidad entre semil
 | | Validación | 0.0645 | 0.0765 | 0.0765 | −0.0004 | 0.136 |
 | | Prueba | 0.0594 | 0.0802 | 0.0762 | −0.0251 | 0.117 |
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 28). El sesgo es la media predicha menos la media observada; el RMSE sin sesgo se calcula después de restarle su media a cada serie; Spearman es la correlación de rangos entre la predicción y la LGD observada.
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py` (celda 28 de `notebooks/regresion.ipynb`). El sesgo es la media predicha menos la media observada; el RMSE sin sesgo se calcula después de restarle su media a cada serie; Spearman es la correlación de rangos entre la predicción y la LGD observada.
 
 ### 4.8 La ventaja de la red es de nivel, no de información
 
@@ -586,7 +586,7 @@ En MAE y RMSE gana la red: en prueba su RMSE es 0.0802, frente a 0.0926 de la re
 
 ![LGD por trimestre](figuras/fig07_lgd_por_trimestre.png)
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 29).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py` (celda 29 de `notebooks/regresion.ipynb`).
 
 Ningún modelo reproduce la distribución observada (Figura 15). En prueba, el 86 % de los créditos tiene LGD $= 1$ exacta. Las predicciones se concentran en un rango estrecho: entre 0.90 y 0.95 la lineal y entre 0.93 y 0.96 la red. Sus desviaciones estándar son 0.018 y 0.010, frente a 0.076 de la observada. Es lo esperable de un estimador de la media condicional cuando las variables explican poco.
 
@@ -594,7 +594,7 @@ Ningún modelo reproduce la distribución observada (Figura 15). En prueba, el 8
 
 ![Distribución acumulada de la LGD](figuras/fig08_ecdf_lgd.png)
 
-*Fuente:* elaboración propia, `notebooks/regresion.ipynb` (celda 31).
+*Fuente:* elaboración propia, `python scripts/parte2_lgd.py` (celda 31 de `notebooks/regresion.ipynb`).
 
 **Conclusión preliminar.** Con variables de originación, la LGD casi no se puede predecir a nivel individual: la correlación de Spearman va de 0.12 a 0.19. Lo que un modelo gana en MAE o RMSE en prueba se debe sobre todo a acertar el nivel de una LGD inflada por el recobro incompleto, no a distinguir entre clientes.
 

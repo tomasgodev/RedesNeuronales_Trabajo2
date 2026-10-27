@@ -1,0 +1,22 @@
+{
+  "descripcion": "Copia de CONFIG y ESPACIO_BUSQUEDA de notebooks/regresion.ipynb (celda 2). La configuración final de la red sale de resultados/config_final_lgd.json (búsqueda de Sebastián).",
+  "semilla": 56,
+  "epocas": 100,
+  "paciencia": 10,
+  "n_busqueda": 30,
+  "n_semillas": 30,
+  "espacio_busqueda": {
+    "capas_ocultas": [[32], [64], [64, 32], [128, 64], [64, 32, 16], [128, 64, 32]],
+    "activacion": ["relu", "tanh", "leaky_relu"],
+    "dropout": [0.0, 0.1, 0.2, 0.3],
+    "weight_decay": [0.0, 1e-05, 0.0001, 0.001],
+    "lr": [0.0001, 0.0003, 0.001, 0.003],
+    "batch_size": [256, 512, 1024],
+    "perdida": ["bce", "mse"]
+  },
+  "demo": {
+    "n_busqueda": 3,
+    "n_semillas": 3,
+    "epocas": 20
+  }
+}
