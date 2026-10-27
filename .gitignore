@@ -1,2 +1,3 @@
 data_loan_clean.csv
 venv
+__pycache__/
