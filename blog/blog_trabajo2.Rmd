@@ -69,7 +69,7 @@ Convertimos la PD en una scorecard (puntaje base 600, odds 50:1, PDO 20) que ord
 2. La exposición al incumplimiento se estima al originar, porque en ese momento no se sabe cuánto habrá pagado el cliente cuando incumpla (Sección 4.9).
 3. La aplicación web pide exactamente las mismas variables que usa el modelo.
 
-**Limitación.** El diccionario no dice en qué fecha se midieron las variables de historial de crédito; por ejemplo, `tot_cur_bal` es *"Total current balance of all accounts"*. Suponemos que corresponden a la fecha de la solicitud. **[PENDIENTE: buscar si hay una fuente que lo confirme.]**
+**Limitación.** El diccionario no dice en qué fecha se midieron las variables de historial de crédito; por ejemplo, `tot_cur_bal` es *"Total current balance of all accounts"*. Suponemos que corresponden a la fecha de la solicitud. Hay un indicio a favor. En los suplementos de prospecto que Lending Club presenta ante la SEC por cada crédito listado, variables como las cuentas en mora, las líneas abiertas y las moras de los últimos dos años aparecen como lo que *"a credit bureau reported"* sobre el solicitante en una fecha cercana a la emisión (LendingClub Corporation, 2020). Ese documento es de 2020, no del periodo de nuestros datos, así que lo tomamos como un indicio y no como una confirmación.
 
 ---
 
@@ -133,7 +133,11 @@ El resultado son **193,050 créditos y 82 variables de entrada**, originados ent
 
 *Fuente:* elaboración propia, `notebooks/procesamiento.ipynb` (celda 14).
 
-**Limitación.** La selección por ANOVA, correlación y V de Cramér se hizo con todos los créditos, incluidos los de validación y prueba. Es una fuga menor: las variables se escogieron mirando también el periodo con el que después se evalúa. **[PENDIENTE: repetir la selección solo con entrenamiento o discutirlo.]**
+**Limitación y verificación.** La selección por ANOVA, correlación y V de Cramér se hizo con todos los créditos, incluidos los de validación y prueba. Es una fuga menor: las variables se escogieron mirando también el periodo con el que después se evalúa.
+
+Para medirla, repetimos las mismas pruebas solo con los créditos de entrenamiento (`python scripts/parte1_seleccion_entrenamiento.py`). Con todos los datos, el script reproduce exactamente los valores del notebook. Solo con entrenamiento cambia una variable: `collections_12_mths_ex_med` pasa de $p < 0.001$ a $p = 0.24$ en el ANOVA, y con la misma regla se habría descartado. Todas las demás decisiones se mantienen.
+
+El efecto es nulo. En la importancia por permutación (Sección 3.7), desordenar esa variable no baja el AUC de ninguno de los dos modelos; en la red queda de última entre 20 grupos. Sin ella, el AUC en prueba de la regresión logística pasa de 0.70330 a 0.70332. Por eso conservamos los datos procesados tal como están.
 
 ### 2.4 Análisis descriptivo e hipótesis
 
@@ -465,7 +469,7 @@ En todos los castigados se cumple $EAD > 0$ y `out_prncp` $= 0$. Solo 38 crédit
 
 ### 4.3 Distribución
 
-La LGD tiene media 0.930, mediana 0.981 y desviación estándar 0.098. El **46.4 %** de los castigados tiene LGD $= 1$, es decir, no se recuperó nada (Figura 12). Hay picos: la razón `recoveries / EAD` se concentra cerca de 5.7 % y 14 %, y la razón `collection_recovery_fee / recoveries`, cerca de 1 % y 18 %. Esto sugiere que la LGD depende más de reglas del proceso de recobro que del perfil del cliente. **[PENDIENTE: hipótesis sin verificar con fuentes.]**
+La LGD tiene media 0.930, mediana 0.981 y desviación estándar 0.098. El **46.4 %** de los castigados tiene LGD $= 1$, es decir, no se recuperó nada (Figura 12). Hay picos: la razón `recoveries / EAD` se concentra cerca de 5.7 % y 14 %, y la razón `collection_recovery_fee / recoveries`, cerca de 1 % y 18 %. Esto sugiere que la LGD depende más de reglas del proceso de recobro que del perfil del cliente. Para la comisión hay una explicación documentada: según su centro de ayuda, Lending Club descuenta de lo recuperado comisiones de cobranza que son porcentajes fijos, de hasta 30 % sin litigio y hasta 40 % con litigio, más las que cobran agencias externas cuando el crédito se castiga (LendingClub, s. f.). Para los picos de `recoveries / EAD` no encontramos una fuente; una posibilidad es la venta de carteras castigadas a un precio fijo, pero no la podemos verificar con estos datos. Las políticas actuales pueden diferir de las del periodo 2007-2015.
 
 **Figura 12.** *Distribución de la LGD en los créditos castigados.*
 
@@ -598,7 +602,7 @@ Ningún modelo reproduce la distribución observada (Figura 15). En prueba, el 8
 
 **Conclusión preliminar.** Con variables de originación, la LGD casi no se puede predecir a nivel individual: la correlación de Spearman va de 0.12 a 0.19. Lo que un modelo gana en MAE o RMSE en prueba se debe sobre todo a acertar el nivel de una LGD inflada por el recobro incompleto, no a distinguir entre clientes.
 
-**[PENDIENTE: decidir cómo tratar el recobro incompleto. Opciones de `docs/parte2_lgd.md`: (a) mantener la partición y reportar el sesgo; (b) usar solo cosechas con recobro maduro; (c) seleccionar hiperparámetros con una métrica sin sesgo, como el RMSE sin sesgo o Spearman.]**
+**Cómo lo tratamos.** Mantenemos la misma partición temporal de la Parte 1 y reportamos el sesgo de nivel junto con métricas que no dependen de él: el RMSE sin sesgo y la correlación de Spearman (Tabla 18). Hay otras dos opciones: usar solo las cosechas con recobro maduro, o escoger los hiperparámetros con una métrica sin sesgo. La primera rompería la coherencia con la Parte 1 y con el caso de uso, porque el modelo se aplica a créditos nuevos. Quedan como trabajo futuro.
 
 ### 4.9 Exposición al incumplimiento y pérdida esperada
 
@@ -899,9 +903,9 @@ con $m = 256$ pasos (regla del punto medio). Por el teorema fundamental del cál
 
 ## Referencias
 
-<!-- [PENDIENTE] Verificar cada referencia (autores, año, páginas y DOI) antes de publicar, como en el Trabajo 1. En particular, confirmar el año y la editorial de Siddiqi. Agregar aquí las que se citen en las secciones que faltan. -->
+<!-- Referencias verificadas el 27 de octubre de 2026 contra las páginas de las revistas, PMLR, arXiv, Scopus y catálogos de bibliotecas (autores, año, volumen, número, páginas y DOI). Se corrigió el número de Bergstra y Bengio (2012). Agregar aquí las que se citen en las secciones que faltan. -->
 
-Bergstra, J., & Bengio, Y. (2012). Random search for hyper-parameter optimization. *Journal of Machine Learning Research, 13*, 281–305. https://jmlr.org/papers/v13/bergstra12a.html
+Bergstra, J., & Bengio, Y. (2012). Random search for hyper-parameter optimization. *Journal of Machine Learning Research, 13*(10), 281–305. https://jmlr.org/papers/v13/bergstra12a.html
 
 Breiman, L. (2001). Random forests. *Machine Learning, 45*(1), 5–32. https://doi.org/10.1023/A:1010933404324
 
@@ -915,11 +919,15 @@ Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network 
 
 Kingma, D. P., & Ba, J. (2015). Adam: A method for stochastic optimization. En *3rd International Conference on Learning Representations (ICLR 2015)*. https://arxiv.org/abs/1412.6980
 
+LendingClub. (s. f.). *What investor payments and fees are required?* LendingClub Help Center. Recuperado el 27 de octubre de 2026 de https://help.lendingclub.com/hc/en-us/articles/215480768-What-fees-does-LendingClub-charge-investors-
+
+LendingClub Corporation. (2020). *Prospectus supplement No. 3320* (Formulario 424B3). U.S. Securities and Exchange Commission. https://www.sec.gov/Archives/edgar/data/1409970/000140997020001174/postsup_20200919-055201-0.htm
+
 Loshchilov, I., & Hutter, F. (2019). Decoupled weight decay regularization. En *7th International Conference on Learning Representations (ICLR 2019)*. https://arxiv.org/abs/1711.05101
 
 Papke, L. E., & Wooldridge, J. M. (1996). Econometric methods for fractional response variables with an application to 401(k) plan participation rates. *Journal of Applied Econometrics, 11*(6), 619–632. https://doi.org/10.1002/(SICI)1099-1255(199611)11:6<619::AID-JAE418>3.0.CO;2-1
 
-ranadeep. (s. f.). *Credit risk analysis* [Conjunto de datos]. Kaggle. Recuperado el **[PENDIENTE: fecha de descarga]** de https://www.kaggle.com/datasets/ranadeep/credit-risk-dataset
+ranadeep. (s. f.). *Credit risk analysis* [Conjunto de datos]. Kaggle. Recuperado el 27 de octubre de 2026 de https://www.kaggle.com/datasets/ranadeep/credit-risk-dataset
 
 Rumelhart, D. E., Hinton, G. E., & Williams, R. J. (1986). Learning representations by back-propagating errors. *Nature, 323*(6088), 533–536. https://doi.org/10.1038/323533a0
 
