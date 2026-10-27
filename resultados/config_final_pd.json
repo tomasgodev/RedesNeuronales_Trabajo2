@@ -1,0 +1,13 @@
+{
+  "modelo": "LGDNN",
+  "capas_ocultas": [
+    32
+  ],
+  "activacion": "relu",
+  "dropout": 0.3,
+  "weight_decay": 0.0001,
+  "lr": 0.001,
+  "batch_size": 512,
+  "epocas": 30,
+  "paciencia": 10
+}
