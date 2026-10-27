@@ -137,6 +137,8 @@ def main():
     pos_weight = calcular_pos_weight(d["y_train"])
     ln_w = float(torch.log(pos_weight))
     print(f"pos_weight = {pos_weight.item():.4f} (ln = {ln_w:.4f})")
+    if odds_base == "cartera":  # odds de la cartera de entrenamiento: el puntaje base es el cliente promedio
+        odds_base = float((d["y_train"] == 0).sum() / (d["y_train"] == 1).sum())
 
     # Regresión logística: misma configuración de notebooks/regresion_logistica.ipynb (celdas 6 y 7)
     t = time.perf_counter()
