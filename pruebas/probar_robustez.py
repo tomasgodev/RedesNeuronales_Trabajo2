@@ -1,8 +1,8 @@
 """Pruebas de robustez: cada comando con parámetros cambiados, extremos e inválidos.
 
 Uso:
-    python scripts/probar_robustez.py            # todos los casos (≈ 10 min)
-    python scripts/probar_robustez.py demo       # solo los casos cuyo nombre contiene "demo"
+    python pruebas/probar_robustez.py            # todos los casos (≈ 10 min)
+    python pruebas/probar_robustez.py demo       # solo los casos cuyo nombre contiene "demo"
 
 Un caso PASA si:
   - se espera que funcione ("ok"): termina sin error y sin traceback;
@@ -133,7 +133,7 @@ CASOS = [
     # ---------------------------------------------------------------- pérdida esperada y app
     ("pérdida esperada: red", EL, [], "ok"),
     ("pérdida esperada: logística", EL, ["--modelo_pd", "logistica"], "ok"),
-    ("app: casos de prueba", "scripts/probar_app.py", [], "ok"),
+    ("app: casos de prueba", "pruebas/probar_app.py", [], "ok"),
 ]
 
 

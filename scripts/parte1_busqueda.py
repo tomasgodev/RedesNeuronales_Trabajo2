@@ -3,7 +3,7 @@
 Uso:
     python scripts/parte1_busqueda.py                  # búsqueda + 30 semillas (≈ 45 min en CPU)
     python scripts/parte1_busqueda.py --demo           # versión corta para la sustentación (< 2 min)
-    python scripts/parte1_busqueda.py --solo_semillas  # usa resultados/config_final_pd.json y corre solo las semillas
+    python scripts/parte1_busqueda.py --solo_semillas  # usa resultados/parte1/config_final_pd.json y corre solo las semillas
     python scripts/parte1_busqueda.py --n_configuraciones 10 --n_semillas 10 --epocas 20
 
 Todos los parámetros vienen de configs/parte1.json y se pueden cambiar con argumentos.
@@ -11,7 +11,7 @@ La búsqueda reutiliza el espacio y el muestreo de notebooks/regresion.ipynb (Pa
 opción de pérdida, porque en clasificación la pérdida es siempre la entropía cruzada ponderada.
 La configuración de Tomás (notebooks/clasificacion.ipynb) entra como candidata número 0.
 
-Salidas: resultados/busqueda_pd.csv, resultados/config_final_pd.json, resultados/semillas_pd.csv
+Salidas: resultados/parte1/busqueda_pd.csv, resultados/parte1/config_final_pd.json, resultados/parte1/semillas_pd.csv
 y weights/modelo_pd_busqueda.pth. En modo demo se escriben en resultados/demo/.
 """
 import argparse
@@ -91,7 +91,7 @@ def main():
     n_sem = args.n_semillas if args.n_semillas is not None else n_sem
     epocas = args.epocas if args.epocas is not None else epocas
 
-    salida = RAIZ / "resultados" / ("demo" if args.demo else "")
+    salida = RAIZ / "resultados" / ("demo" if args.demo else "parte1")
     salida.mkdir(parents=True, exist_ok=True)
     inicio_total = time.perf_counter()
 

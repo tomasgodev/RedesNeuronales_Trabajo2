@@ -2,3 +2,19 @@ data_loan_clean.csv
 venv
 /.venv
 /app/__pycache__
+
+# Python y sistema
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+
+# Salidas temporales del modo demo y de corridas con parámetros modificados
+resultados/demo/
+resultados/parte2/figuras/
+weights/*_demo.pth
+
+# Archivos de R al compilar el blog
+.Rhistory
+blog/*.html
+blog/*_files/

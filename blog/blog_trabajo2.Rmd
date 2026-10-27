@@ -13,8 +13,8 @@ output:
 <!--
 BORRADOR. Mismo formato del blog del Trabajo 1 (blog_trabajo1.Rmd).
 Las marcas [PENDIENTE] señalan lo que falta; se pueden buscar con: grep -n "PENDIENTE" blog/blog_trabajo2.Rmd
-Fuentes de contenido: reporte/blog_post_tecnico_(Borrador).md, docs/parte2_lgd.md,
-docs/fundamentacion_matematica.md y las salidas de los notebooks. Ninguno de esos archivos se modificó.
+Fuentes de contenido: archivo/docs/blog_post_tecnico_(Borrador).md, docs/parte2_lgd.md,
+archivo/docs/fundamentacion_matematica.md y las salidas de los notebooks. Ninguno de esos archivos se modificó.
 Todos los números salen de las salidas guardadas en los notebooks o de los scripts de scripts/; la fuente se indica en cada tabla y figura.
 -->
 
@@ -141,7 +141,7 @@ El efecto es nulo. En la importancia por permutación (Sección 3.7), desordenar
 
 ### 2.4 Análisis descriptivo e hipótesis
 
-Antes de entrenar los modelos, el equipo formuló cuatro hipótesis sobre qué hace más riesgosa a una persona; están en el borrador `reporte/blog_post_tecnico_(Borrador).md`. Las contrastamos solo con el periodo de entrenamiento, para no mirar los créditos con los que después se evalúa (Tabla 3 y Figura 3). La tasa promedio de incumplimiento en ese periodo es 21.7 %.
+Antes de entrenar los modelos, el equipo formuló cuatro hipótesis sobre qué hace más riesgosa a una persona; están en el borrador `archivo/docs/blog_post_tecnico_(Borrador).md`. Las contrastamos solo con el periodo de entrenamiento, para no mirar los créditos con los que después se evalúa (Tabla 3 y Figura 3). La tasa promedio de incumplimiento en ese periodo es 21.7 %.
 
 **Tabla 3.** *Hipótesis y tasa de incumplimiento en el periodo de entrenamiento.*
 
@@ -271,7 +271,7 @@ Las 31 configuraciones tardaron 9.6 minutos y quedaron entre 0.7072 y 0.7148 de 
 | [64, 32] | Leaky ReLU | 0.3 | $10^{-3}$ | $3\cdot10^{-4}$ | 1024 | 7,617 | 0.7136 |
 | [64, 32, 16] (red base) | ReLU | 0.2 (0 en la última) | $10^{-4}$ | $10^{-3}$ | 512 | 8,161 | 0.7133 |
 
-*Fuente:* elaboración propia, `python scripts/parte1_busqueda.py` (`resultados/busqueda_pd.csv` y `resultados/config_final_pd.json`).
+*Fuente:* elaboración propia, `python scripts/parte1_busqueda.py` (`resultados/parte1/busqueda_pd.csv` y `resultados/parte1/config_final_pd.json`).
 
 La ganadora es la red más pequeña de la búsqueda: una sola capa oculta de 32 neuronas. La diferencia con la red base (0.0015 de AUC) es del mismo orden que la variabilidad entre semillas. Por eso entrenamos ambas con 30 semillas (0 a 29); los resultados están en la Tabla 7.
 
@@ -288,7 +288,7 @@ La ganadora es la red más pequeña de la búsqueda: una sola capa oculta de 32 
 | | KS | 0.3004 | 0.0028 | 0.3073 | 0.2958 |
 | | Brier | 0.1713 | 0.0004 | 0.1706 | 0.1722 |
 
-*Fuente:* elaboración propia, `python scripts/parte1_busqueda.py` (`resultados/semillas_pd.csv`). Para el Brier, mejor es menor.
+*Fuente:* elaboración propia, `python scripts/parte1_busqueda.py` (`resultados/parte1/semillas_pd.csv`). Para el Brier, mejor es menor.
 
 La red de la búsqueda es un poco mejor y más estable que la base, con un tercio de los parámetros. Las dos quedan a menos de 0.002 de AUC de la regresión logística (Tabla 5).
 
