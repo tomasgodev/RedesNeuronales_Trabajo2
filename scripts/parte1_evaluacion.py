@@ -109,11 +109,15 @@ def gradientes_integrados(model, X_t, pasos, lote=2048):
 def guardar(fig, nombre):
     fig.savefig(FIGURAS / nombre, dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print(f"  figura: blog/figuras/{nombre}")
+    print(f"  figura: {(FIGURAS / nombre).relative_to(RAIZ)}")
 
 
 def main():
+    global SALIDA, FIGURAS
     args = leer_argumentos()
+    if args.rapido:  # no sobrescribe los resultados completos ni las figuras del blog
+        SALIDA = RAIZ / "resultados" / "demo" / "parte1"
+        FIGURAS = RAIZ / "resultados" / "demo" / "figuras"
     cfg = json.loads(Path(args.config).read_text())
     sc_cfg = cfg["scorecard"]
     puntaje_base = args.puntaje_base if args.puntaje_base is not None else sc_cfg["puntaje_base"]
