@@ -237,3 +237,68 @@ def entrenar_clasificador(config, X_train_t, y_train_t, X_val_t, y_val, pos_weig
     model.load_state_dict(best_state)
     model.eval()
     return model, history
+
+
+# ---------------------------------------------------------------------------
+# Parte 2 (LGD): funciones de notebooks/regresion.ipynb
+# ---------------------------------------------------------------------------
+def perdida(logits, y, tipo):
+    # COPIA de notebooks/regresion.ipynb, celda 15
+    if tipo == "bce":
+        return nn.functional.binary_cross_entropy_with_logits(logits, y)
+    return nn.functional.mse_loss(torch.sigmoid(logits), y)
+
+
+def metricas_regresion(y, pred):
+    # COPIA de metricas() en notebooks/regresion.ipynb, celda 13
+    from sklearn.metrics import mean_absolute_error, root_mean_squared_error
+    return {"MAE": mean_absolute_error(y, pred), "RMSE": root_mean_squared_error(y, pred)}
+
+
+def entrenar_lgd(config, semilla, X_train_t, y_train_t, X_val_t, y_val_t, verbose=True):
+    """entrenar_mlp de notebooks/regresion.ipynb (celda 16), con la misma lógica.
+
+    Única diferencia: en el notebook los tensores de entrenamiento y validación son variables
+    globales; aquí se reciben como argumentos para poder llamarla desde un script.
+    """
+    fijar_semilla(semilla)
+    modelo = LGDNN(X_train_t.shape[1], config["capas_ocultas"], config["activacion"], config["dropout"]).to(device)
+    optimizer = torch.optim.Adam(modelo.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", patience=3, factor=0.5)
+    loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=config["batch_size"], shuffle=True)
+
+    historia = {"train_loss": [], "val_loss": []}
+    mejor_val, mejor_estado, sin_mejora = float("inf"), None, 0
+
+    for epoca in range(1, config["epocas"] + 1):
+        modelo.train()
+        total = 0.0
+        for X_batch, y_batch in loader:
+            optimizer.zero_grad()
+            loss = perdida(modelo(X_batch), y_batch, config["perdida"])
+            loss.backward()
+            optimizer.step()
+            total += loss.item() * len(y_batch)
+
+        modelo.eval()
+        with torch.no_grad():
+            val_loss = perdida(modelo(X_val_t), y_val_t, config["perdida"]).item()
+        scheduler.step(val_loss)
+        historia["train_loss"].append(total / len(y_train_t))
+        historia["val_loss"].append(val_loss)
+
+        if val_loss < mejor_val:
+            mejor_val, sin_mejora = val_loss, 0
+            mejor_estado = {k: v.clone() for k, v in modelo.state_dict().items()}
+        else:
+            sin_mejora += 1
+
+        if verbose and (epoca % 5 == 0 or epoca == 1):
+            print(f"Época {epoca:03d} | train: {historia['train_loss'][-1]:.4f} | val: {val_loss:.4f} | lr: {optimizer.param_groups[0]['lr']:.1e}")
+        if sin_mejora >= config["paciencia"]:
+            if verbose:
+                print(f"Parada temprana en la época {epoca}; mejor val: {mejor_val:.4f}")
+            break
+
+    modelo.load_state_dict(mejor_estado)
+    return modelo, historia
