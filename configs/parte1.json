@@ -1,0 +1,47 @@
+{
+  "semilla": 56,
+  "modelo_base": {
+    "modelo": "CreditRiskNN",
+    "descripcion": "Arquitectura fijada a mano en notebooks/clasificacion.ipynb: 82 -> 64 -> 32 -> 16 -> 1, BatchNorm, ReLU, dropout 0.2 en las dos primeras capas",
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 512,
+    "epocas": 30,
+    "paciencia": 10
+  },
+  "busqueda": {
+    "n_configuraciones": 30,
+    "epocas": 30,
+    "paciencia": 10,
+    "criterio": "AUC de validación",
+    "espacio": {
+      "capas_ocultas": [[32], [64], [64, 32], [128, 64], [64, 32, 16], [128, 64, 32]],
+      "activacion": ["relu", "tanh", "leaky_relu"],
+      "dropout": [0.0, 0.1, 0.2, 0.3],
+      "weight_decay": [0.0, 1e-05, 0.0001, 0.001],
+      "lr": [0.0001, 0.0003, 0.001, 0.003],
+      "batch_size": [256, 512, 1024]
+    }
+  },
+  "n_semillas": 30,
+  "regresion_logistica": {
+    "max_iter": 5000,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "scorecard": {
+    "puntaje_base": 600,
+    "odds_base": 50,
+    "pdo": 20
+  },
+  "interpretabilidad": {
+    "repeticiones_permutacion": 5,
+    "pasos_gradientes_integrados": 256
+  },
+  "demo": {
+    "muestra_entrenamiento": 20000,
+    "n_configuraciones": 3,
+    "n_semillas": 3,
+    "epocas": 5
+  }
+}
