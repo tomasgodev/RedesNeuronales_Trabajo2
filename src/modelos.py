@@ -199,7 +199,9 @@ def entrenar_clasificador(config, X_train_t, y_train_t, X_val_t, y_val, pos_weig
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", patience=3, factor=0.5)
-    train_loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=config["batch_size"], shuffle=True)
+    # Si el último lote quedara de un solo crédito, BatchNorm no puede calcular su varianza: se descarta ese lote.
+    train_loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=config["batch_size"], shuffle=True,
+                              drop_last=len(X_train_t) % config["batch_size"] == 1)
 
     history = {"train_loss": [], "val_auc": []}
     best_val_auc, best_state, patience_counter = 0.0, None, 0
@@ -265,7 +267,9 @@ def entrenar_lgd(config, semilla, X_train_t, y_train_t, X_val_t, y_val_t, verbos
     modelo = LGDNN(X_train_t.shape[1], config["capas_ocultas"], config["activacion"], config["dropout"]).to(device)
     optimizer = torch.optim.Adam(modelo.parameters(), lr=config["lr"], weight_decay=config["weight_decay"])
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", patience=3, factor=0.5)
-    loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=config["batch_size"], shuffle=True)
+    # Si el último lote quedara de un solo crédito, BatchNorm no puede calcular su varianza: se descarta ese lote.
+    loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=config["batch_size"], shuffle=True,
+                        drop_last=len(X_train_t) % config["batch_size"] == 1)
 
     historia = {"train_loss": [], "val_loss": []}
     mejor_val, mejor_estado, sin_mejora = float("inf"), None, 0

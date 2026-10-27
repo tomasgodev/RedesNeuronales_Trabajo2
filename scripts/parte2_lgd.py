@@ -34,6 +34,9 @@ sys.path.append(str(RAIZ))
 from src.modelos import (  # noqa: E402
     RUTA_LINEAL_LGD, a_tensor, cargar_modelo_lgd, contar_parametros, entrenar_lgd, metricas_regresion, predecir,
 )
+from src.validacion import (  # noqa: E402
+    entero_no_negativo, entero_positivo, fraccion, leer_config, no_negativo, revisar, revisar_espacio, tamano_lote,
+)
 from src.preprocesamiento import (  # noqa: E402
     INICIO_PRUEBA, INICIO_VALIDACION, cargar_datos_procesados, columnas_entrada, particion_temporal,
 )
@@ -49,18 +52,18 @@ def leer_argumentos():
     p.add_argument("--busqueda", action="store_true", help="búsqueda aleatoria y 30 semillas completas")
     p.add_argument("--descriptivo", action="store_true", help="estadísticas de la LGD con el archivo original")
     g = p.add_argument_group("red que se reentrena (por defecto, resultados/config_final_lgd.json)")
-    g.add_argument("--capas", type=int, nargs="+")
+    g.add_argument("--capas", type=entero_positivo, nargs="+")
     g.add_argument("--activacion", choices=["relu", "tanh", "leaky_relu"])
-    g.add_argument("--dropout", type=float)
-    g.add_argument("--lr", type=float)
-    g.add_argument("--weight_decay", type=float)
-    g.add_argument("--batch_size", type=int)
+    g.add_argument("--dropout", type=fraccion, help="entre 0 y 1")
+    g.add_argument("--lr", type=no_negativo)
+    g.add_argument("--weight_decay", type=no_negativo)
+    g.add_argument("--batch_size", type=tamano_lote)
     g.add_argument("--perdida", choices=["bce", "mse"])
-    g.add_argument("--epocas", type=int)
-    g.add_argument("--paciencia", type=int)
-    g.add_argument("--semilla", type=int)
-    g.add_argument("--n_busqueda", type=int)
-    g.add_argument("--n_semillas", type=int)
+    g.add_argument("--epocas", type=entero_positivo)
+    g.add_argument("--paciencia", type=entero_no_negativo)
+    g.add_argument("--semilla", type=entero_no_negativo)
+    g.add_argument("--n_busqueda", type=entero_positivo)
+    g.add_argument("--n_semillas", type=entero_positivo)
     return p.parse_args()
 
 
@@ -119,7 +122,13 @@ def comparar(preds_por_modelo, y_real):
 
 def main():
     args = leer_argumentos()
-    cfg = json.loads(Path(args.config).read_text())
+    cfg = leer_config(args.config)
+    revisar([("semilla", cfg["semilla"], entero_no_negativo), ("epocas", cfg["epocas"], entero_positivo),
+             ("paciencia", cfg["paciencia"], entero_no_negativo), ("n_busqueda", cfg["n_busqueda"], entero_positivo),
+             ("n_semillas", cfg["n_semillas"], entero_positivo), ("demo.n_busqueda", cfg["demo"]["n_busqueda"], entero_positivo),
+             ("demo.n_semillas", cfg["demo"]["n_semillas"], entero_positivo), ("demo.epocas", cfg["demo"]["epocas"], entero_positivo)],
+            Path(args.config).name)
+    revisar_espacio(cfg["espacio_busqueda"], Path(args.config).name)
     t0 = time.perf_counter()
     salida = RAIZ / "resultados" / ("demo/parte2" if args.demo else "parte2")
     figuras = salida / "figuras" if args.demo else RAIZ / "blog" / "figuras"

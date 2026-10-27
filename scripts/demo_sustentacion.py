@@ -31,27 +31,30 @@ from src.modelos import (  # noqa: E402
 )
 from metricas_clasificacion import calcular_metricas_completas  # noqa: E402
 from scorecard_engine import CreditScorecard  # noqa: E402
+from src.validacion import (  # noqa: E402
+    entero_no_negativo, entero_positivo, fraccion, no_negativo, positivo, tamano_lote,
+)
 
 
 def leer_argumentos():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = p.add_argument_group("red neuronal")
-    g.add_argument("--capas", type=int, nargs="+", help="neuronas por capa oculta, p. ej. --capas 128 64")
+    g.add_argument("--capas", type=entero_positivo, nargs="+", help="neuronas por capa oculta, p. ej. --capas 128 64")
     g.add_argument("--activacion", choices=["relu", "tanh", "leaky_relu"], help="por defecto relu")
-    g.add_argument("--dropout", type=float, help="por defecto 0.2")
-    g.add_argument("--lr", type=float, default=1e-3)
-    g.add_argument("--weight_decay", type=float, default=1e-4, help="penalización L2")
-    g.add_argument("--batch_size", type=int, default=512)
-    g.add_argument("--epocas", type=int, default=15)
-    g.add_argument("--paciencia", type=int, default=10)
-    g.add_argument("--semilla", type=int, default=56)
-    g.add_argument("--muestra", type=int, help="créditos de entrenamiento a usar (por defecto, todos)")
+    g.add_argument("--dropout", type=fraccion, help="entre 0 y 1; por defecto 0.2")
+    g.add_argument("--lr", type=no_negativo, default=1e-3)
+    g.add_argument("--weight_decay", type=no_negativo, default=1e-4, help="penalización L2")
+    g.add_argument("--batch_size", type=tamano_lote, default=512)
+    g.add_argument("--epocas", type=entero_positivo, default=15)
+    g.add_argument("--paciencia", type=entero_no_negativo, default=10)
+    g.add_argument("--semilla", type=entero_no_negativo, default=56)
+    g.add_argument("--muestra", type=entero_positivo, help="créditos de entrenamiento a usar (por defecto, todos)")
     g.add_argument("--sin_peso_clase", action="store_true", help="entrena sin pos_weight")
     s = p.add_argument_group("scorecard")
     s.add_argument("--puntaje_base", type=float, default=600)
-    s.add_argument("--odds_base", type=float, help="por defecto, las odds de la cartera de entrenamiento (N0/N1)")
-    s.add_argument("--pdo", type=float, default=20)
-    return p.parse_args()
+    s.add_argument("--odds_base", type=positivo, help="mayor que 0; por defecto, las odds de la cartera de entrenamiento (N0/N1)")
+    s.add_argument("--pdo", type=positivo, default=20)
+    return p, p.parse_args()
 
 
 def linea(texto=""):
@@ -59,7 +62,7 @@ def linea(texto=""):
 
 
 def main():
-    args = leer_argumentos()
+    parser, args = leer_argumentos()
     t0 = time.perf_counter()
     linea("=" * 72)
     linea("TRABAJO 2 · ¿ME PRESTAS? · DEMOSTRACIÓN CON DATOS Y MODELOS REALES")
@@ -67,9 +70,13 @@ def main():
 
     d = datos_parte1()
     X_train, y_train = d["X_train"], d["y_train"]
-    if args.muestra:
+    if args.muestra is not None:
+        if args.muestra > len(X_train):
+            parser.error(f"--muestra {args.muestra} es mayor que el número de créditos de entrenamiento ({len(X_train):,})")
         idx = np.random.default_rng(args.semilla).choice(len(X_train), args.muestra, replace=False)
         X_train, y_train = X_train.iloc[idx], y_train[idx]
+        if len(np.unique(y_train)) < 2:
+            parser.error(f"la muestra de {args.muestra} créditos no tiene buenos y malos pagadores a la vez; use una muestra más grande")
     scaler = StandardScaler().fit(X_train)
     X_tr, X_va, X_te = (a_tensor(scaler.transform(X)) for X in (X_train, d["X_val"], d["X_test"]))
     pos_weight = calcular_pos_weight(y_train)
