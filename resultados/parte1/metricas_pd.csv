@@ -1,0 +1,7 @@
+modelo,conjunto,N,Tasa Default,AUC,Gini,KS,Brier,Brier_Referencia
+Regresión logística,val,38300,0.2641,0.71,0.42,0.3086,0.1761,0.1944
+Regresión logística,test,36378,0.2522,0.7033,0.4066,0.3057,0.1722,0.1886
+Red neuronal,val,38300,0.2641,0.7131,0.4262,0.3122,0.1744,0.1944
+Red neuronal,test,36378,0.2522,0.7033,0.4066,0.2997,0.1709,0.1886
+Regresión logística sin corregir,val,38300,0.2641,0.71,0.42,0.3086,0.217,0.1944
+Regresión logística sin corregir,test,36378,0.2522,0.7033,0.4066,0.3057,0.2209,0.1886

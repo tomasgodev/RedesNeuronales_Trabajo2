@@ -1,0 +1,68 @@
+# Cómo ejecutar el trabajo
+
+Comandos para reproducir los resultados de `scripts/`, `app/` y `blog/`. Todos se corren desde la raíz del repositorio y con el entorno activado. Los tiempos son de un MacBook con Apple M1, en CPU.
+
+## 1. Entorno
+
+```bash
+python3.14 -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
+pip install -r requirements-lock.txt # versiones exactas; requirements.txt es la lista original sin versiones
+```
+
+## 2. Datos
+
+`datasets/creditos_procesados.csv.gz` ya está en el repositorio, así que nada de lo que sigue necesita internet. Para regenerarlo desde el archivo original de Kaggle (la primera vez lo descarga con `kagglehub`):
+
+```bash
+python -m src.preprocesamiento
+```
+
+Verificado el 27 de octubre de 2026: con la versión 3 del conjunto, este comando produce un archivo idéntico al del repositorio.
+
+## 3. Experimentos
+
+| Comando | Qué hace | Tiempo |
+|---|---|---|
+| `python scripts/demo_sustentacion.py` | **Demostración en vivo.** Entrena la red de la Parte 1, la compara con la logística y calcula la scorecard y la pérdida esperada. | 14 s |
+| `python scripts/parte1_evaluacion.py` | Evalúa la logística y la red guardada, construye la scorecard e interpreta los modelos. Genera las figuras 9 a 14. | 10 s |
+| `python scripts/parte1_busqueda.py --demo` | Búsqueda de hiperparámetros y semillas en versión corta. | 10 s |
+| `python scripts/parte1_busqueda.py` | Búsqueda aleatoria (30 configuraciones más la base) y 30 semillas de la configuración final y de la base. | ≈ 35 min |
+| `python scripts/perdida_esperada.py` | Pérdida esperada $E[L] = PD \cdot LGD \cdot EAD$ en prueba con los modelos guardados. | 5 s |
+| `python scripts/parte1_descriptivo.py` | Hipótesis H1 a H4 y créditos excluidos por cosecha. Necesita el archivo original (sección 2). | 10 s |
+| `notebooks/regresion.ipynb` | Parte 2 (LGD). Pendiente pasarla a un script. | — |
+
+Los parámetros están en `configs/parte1.json` y también se pueden cambiar desde la línea de comandos, sin editar el código. Ejemplos para la modificación en vivo:
+
+```bash
+python scripts/demo_sustentacion.py --lr 0.01 --dropout 0.5
+python scripts/demo_sustentacion.py --capas 128 64 --activacion tanh --epocas 10
+python scripts/demo_sustentacion.py --sin_peso_clase
+python scripts/demo_sustentacion.py --pdo 40 --puntaje_base 700 --odds_base 20
+python scripts/parte1_evaluacion.py --pdo 25 --puntaje_base 650
+python scripts/demo_sustentacion.py --help
+```
+
+Semillas: 56 para la búsqueda, la regresión logística usa `random_state=42`, y las corridas independientes usan las semillas 0 a 29.
+
+## 4. Aplicación web
+
+```bash
+streamlit run app/app_riesgo.py
+```
+
+Usa los modelos guardados en `weights/`; no reentrena. `app/opciones_app.json` (categorías, valores por defecto y rangos) se regenera con `python scripts/preparar_app.py`, que necesita el archivo original.
+
+## 5. Blog
+
+```bash
+Rscript -e 'rmarkdown::render("blog/blog_trabajo2.Rmd")'
+```
+
+Necesita R con `rmarkdown` y pandoc (viene con RStudio).
+
+## Notas
+
+- Los modelos de los notebooks están guardados en `weights/`, y los scripts los cargan sin reentrenar. `src/modelos.py` tiene copias exactas de las clases y funciones de los notebooks, porque un notebook no se puede importar desde un script.
+- `scripts/run_demo.py`, `scripts/evaluar_30_semillas_clasif.py` y `resultados/semillas_clasificacion.csv` generan o contienen métricas simuladas con números aleatorios, no con el modelo. Los resultados de los modelos están en `resultados/parte1/`, `resultados/semillas_pd.csv` y `resultados/perdida_esperada/`.
+- `codificar()` de `src/preprocesamiento.py` no sirve tal cual para codificar un solo solicitante: con una sola fila, `get_dummies(drop_first=True)` elimina la categoría presente. `app/motor_riesgo.py` explica cómo se evita.

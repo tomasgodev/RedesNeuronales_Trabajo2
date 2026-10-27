@@ -1,0 +1,223 @@
+{
+  "numericas": {
+    "loan_amnt": {
+      "defecto": 12000.0,
+      "min": 2000.0,
+      "max": 35000.0,
+      "entero": false
+    },
+    "int_rate": {
+      "defecto": 14.33,
+      "min": 6.03,
+      "max": 24.89,
+      "entero": false
+    },
+    "annual_inc": {
+      "defecto": 65000.0,
+      "min": 22000.0,
+      "max": 230000.0,
+      "entero": false
+    },
+    "dti": {
+      "defecto": 16.68,
+      "min": 2.0,
+      "max": 33.62,
+      "entero": false
+    },
+    "delinq_2yrs": {
+      "defecto": 0.0,
+      "min": 0.0,
+      "max": 3.0,
+      "entero": true
+    },
+    "inq_last_6mths": {
+      "defecto": 1.0,
+      "min": 0.0,
+      "max": 4.0,
+      "entero": true
+    },
+    "open_acc": {
+      "defecto": 10.0,
+      "min": 3.0,
+      "max": 25.0,
+      "entero": true
+    },
+    "revol_bal": {
+      "defecto": 11877.0,
+      "min": 474.71000000000004,
+      "max": 74563.37999999986,
+      "entero": false
+    },
+    "revol_util": {
+      "defecto": 59.1,
+      "min": 3.1,
+      "max": 97.3,
+      "entero": false
+    },
+    "total_acc": {
+      "defecto": 24.0,
+      "min": 6.0,
+      "max": 59.0,
+      "entero": true
+    },
+    "collections_12_mths_ex_med": {
+      "defecto": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "entero": true
+    },
+    "acc_now_delinq": {
+      "defecto": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "entero": true
+    },
+    "tot_cur_bal": {
+      "defecto": 81371.0,
+      "min": 3611.0,
+      "max": 635558.9099999989,
+      "entero": false
+    }
+  },
+  "categoricas": {
+    "term": {
+      "opciones": [
+        " 36 months",
+        " 60 months"
+      ],
+      "defecto": " 36 months"
+    },
+    "home_ownership": {
+      "opciones": [
+        "ANY",
+        "MORTGAGE",
+        "NONE",
+        "OTHER",
+        "OWN",
+        "RENT"
+      ],
+      "defecto": "MORTGAGE"
+    },
+    "purpose": {
+      "opciones": [
+        "car",
+        "credit_card",
+        "debt_consolidation",
+        "home_improvement",
+        "house",
+        "major_purchase",
+        "medical",
+        "moving",
+        "other",
+        "renewable_energy",
+        "small_business",
+        "vacation",
+        "wedding"
+      ],
+      "defecto": "debt_consolidation"
+    },
+    "addr_state": {
+      "opciones": [
+        "AK",
+        "AL",
+        "AR",
+        "AZ",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "IA",
+        "IL",
+        "IN",
+        "KS",
+        "KY",
+        "LA",
+        "MA",
+        "MD",
+        "ME",
+        "MI",
+        "MN",
+        "MO",
+        "MS",
+        "MT",
+        "NC",
+        "ND",
+        "NE",
+        "NH",
+        "NJ",
+        "NM",
+        "NV",
+        "NY",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VA",
+        "VT",
+        "WA",
+        "WI",
+        "WV",
+        "WY"
+      ],
+      "defecto": "CA"
+    },
+    "sub_grade": {
+      "opciones": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5",
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5"
+      ],
+      "defecto": "B3"
+    },
+    "verification_status": {
+      "opciones": [
+        "Not Verified",
+        "Source Verified",
+        "Verified"
+      ],
+      "defecto": "Verified"
+    }
+  }
+}
