@@ -1,0 +1,15 @@
+{
+  "epocas": 100,
+  "paciencia": 10,
+  "capas_ocultas": [
+    64,
+    32,
+    16
+  ],
+  "activacion": "tanh",
+  "dropout": 0.2,
+  "weight_decay": 1e-05,
+  "lr": 0.0003,
+  "batch_size": 512,
+  "perdida": "mse"
+}
