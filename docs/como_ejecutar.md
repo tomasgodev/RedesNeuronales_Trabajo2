@@ -30,6 +30,7 @@ Verificado el 27 de octubre de 2026: con la versión 3 del conjunto, este comand
 | `python scripts/parte1_busqueda.py` | Búsqueda aleatoria (30 configuraciones más la base) y 30 semillas de la configuración final y de la base. | ≈ 35 min |
 | `python scripts/perdida_esperada.py` | Pérdida esperada $E[L] = PD \cdot LGD \cdot EAD$ en prueba con los modelos guardados. | 5 s |
 | `python scripts/parte1_descriptivo.py` | Hipótesis H1 a H4 y créditos excluidos por cosecha. Necesita el archivo original (sección 2). | 10 s |
+| `python scripts/parte1_seleccion_entrenamiento.py` | Repite la selección de variables de `notebooks/procesamiento.ipynb` solo con entrenamiento, para medir la fuga. Necesita el archivo original (sección 2). | 8 s |
 | `python scripts/parte2_lgd.py` | Parte 2 (LGD). Reproduce `notebooks/regresion.ipynb` sin internet: compara con los modelos guardados, calcula la EAD y la pérdida con PD = 1, y reentrena la configuración final (resultados idénticos al notebook). Genera `blog/figuras/fig06` a `fig08`. | 13 s |
 | `python scripts/parte2_lgd.py --demo` | Lo anterior más una búsqueda y semillas cortas. | 17 s |
 | `python scripts/parte2_lgd.py --busqueda` | Lo anterior más la búsqueda aleatoria (30) y las 30 semillas. Escribe en `resultados/parte2/` y no toca los resultados del notebook. | ≈ 8 min |
@@ -58,6 +59,15 @@ streamlit run app/app_riesgo.py
 ```
 
 Usa los modelos guardados en `weights/`; no reentrena. `app/opciones_app.json` (categorías, valores por defecto y rangos) se regenera con `python scripts/preparar_app.py`, que necesita el archivo original.
+
+### Publicarla en Streamlit Community Cloud
+
+1. Entrar a https://share.streamlit.io con una cuenta de GitHub que tenga acceso al repositorio.
+2. Crear una app con el repositorio `tomasgodev/RedesNeuronales_Trabajo2`, la rama `main` y el archivo principal `app/app_riesgo.py`.
+3. En **Advanced settings**, escoger Python 3.12.
+4. Poner la URL pública de la app en el encabezado del blog. Cuando existan, poner en `app/app_riesgo.py` los enlaces al reporte (`ENLACE_REPORTE`) y al video (`ENLACE_VIDEO`).
+
+La plataforma instala las dependencias de `app/requirements.txt`, que tiene prioridad sobre el `requirements.txt` de la raíz porque está junto al archivo principal. Ese archivo instala torch solo para CPU, sin las librerías de CUDA. Se verificó que todas las versiones existen para Linux con Python 3.12 y 3.14.
 
 ## 5. Blog
 

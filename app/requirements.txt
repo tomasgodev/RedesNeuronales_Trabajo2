@@ -1,0 +1,13 @@
+# Dependencias para publicar la app en Streamlit Community Cloud.
+# Community Cloud usa primero el archivo de dependencias que está junto al punto de entrada
+# (app/app_riesgo.py), así que este archivo tiene prioridad sobre el requirements.txt de la raíz.
+# torch se instala desde el índice de PyTorch solo para CPU, para no descargar las librerías de CUDA.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
+numpy==2.5.4
+pandas==3.1.0
+scikit-learn==1.9.1
+scipy==1.18.1
+matplotlib==3.11.2
+joblib==1.6.0
+streamlit==1.66.1
