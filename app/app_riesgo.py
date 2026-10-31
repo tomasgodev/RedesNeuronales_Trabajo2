@@ -13,7 +13,8 @@ import streamlit as st
 sys.path.append(str(Path(__file__).resolve().parent))
 from motor_riesgo import MotorRiesgo  # noqa: E402
 from scorecard_engine import CreditScorecard  # noqa: E402
-from estilos import CIRUELA, aplicar_estilos, encabezado, moneda_puntaje, titulo_seccion  # noqa: E402
+from estilos import (RIESGO_ALTO, RIESGO_BAJO, SALVIA, SALVIA_CLARA, TINTA, TINTA_SUAVE,  # noqa: E402
+                     aplicar_estilos, encabezado, moneda_puntaje, titulo_seccion)
 
 # [PENDIENTE] Enlaces definitivos
 ENLACE_REPORTE = ""
@@ -85,9 +86,9 @@ def campo(motor, variable, valor, clave, contenedor):
 def grafica_poblacion(puntajes, puntaje_cliente):
     fig, ax = plt.subplots(figsize=(7, 2.6))
     bins = np.arange(puntajes.min() - 0.5, puntajes.max() + 1.5, 3)
-    ax.hist(puntajes, bins=bins, color="#E7DDFB")
-    ax.hist(puntajes[puntajes <= puntaje_cliente], bins=bins, color="#CDB4F6")
-    ax.axvline(puntaje_cliente, color="#E36A78", linewidth=2.5)
+    ax.hist(puntajes, bins=bins, color=SALVIA_CLARA)
+    ax.hist(puntajes[puntajes <= puntaje_cliente], bins=bins, color=SALVIA)
+    ax.axvline(puntaje_cliente, color=TINTA, linewidth=2.5)
     ax.set(xlabel="Puntaje", yticks=[], xlim=(np.percentile(puntajes, 0.5) - 10, np.percentile(puntajes, 99.5) + 10))
     return estilo_grafica(fig, ax)
 
@@ -96,23 +97,23 @@ def grafica_puntos(base, puntos):
     top = puntos.head(10)[::-1]
     fig, ax = plt.subplots(figsize=(7, 4))
     ax.barh([NOMBRES.get(v, v) for v in top.index], top.values, height=0.62,
-            color=["#7FCFAF" if v > 0 else "#EE7C87" for v in top.values])
-    ax.axvline(0, color=CIRUELA, linewidth=0.8)
+            color=[RIESGO_BAJO if v > 0 else RIESGO_ALTO for v in top.values])
+    ax.axvline(0, color=TINTA, linewidth=0.8)
     ax.set(xlabel=f"Puntos frente al cliente promedio ({base:.0f} puntos)")
-    ax.grid(axis="x", color="#E7DDFB")
+    ax.grid(axis="x", color="#E3E9E5")
     return estilo_grafica(fig, ax)
 
 
 def estilo_grafica(fig, ax):
-    """Fondo transparente, texto ciruela y sin marcos, para que la gráfica se integre al diseño."""
+    """Fondo transparente, texto en tinta y sin marcos, para que la gráfica se integre al diseño."""
     fig.patch.set_alpha(0)
     ax.set_facecolor("none")
     ax.set_axisbelow(True)
     for lado in ["top", "right", "left"]:
         ax.spines[lado].set_visible(False)
-    ax.spines["bottom"].set_color("#CDB4F6")
-    ax.tick_params(colors="#6E5C85", length=0)
-    ax.xaxis.label.set_color("#6E5C85")
+    ax.spines["bottom"].set_color("#C9D6CF")
+    ax.tick_params(colors=TINTA_SUAVE, length=0)
+    ax.xaxis.label.set_color(TINTA_SUAVE)
     fig.tight_layout()
     return fig
 
@@ -178,8 +179,8 @@ def main():
     with col_res:
         titulo_seccion(2, "El resultado")
         moneda_puntaje(r["puntaje"], r["pd"], r["percentil"])
-        st.caption("Créditos de prueba (originados entre noviembre de 2014 y diciembre de 2015): en lavanda, los que "
-                   "tienen un puntaje menor o igual; la línea rosa es esta solicitud.")
+        st.caption("Créditos de prueba (originados entre noviembre de 2014 y diciembre de 2015): en verde, los que "
+                   "tienen un puntaje menor o igual; la línea oscura es esta solicitud.")
         st.pyplot(grafica_poblacion(motor.puntajes_poblacion(sc), r["puntaje"]), clear_figure=True)
         d, e, f = st.columns(3)
         d.metric("Pérdida si incumple (LGD)", f"{r['lgd']:.0%}")
@@ -197,7 +198,7 @@ def main():
     titulo_seccion(3, "¿Por qué ese puntaje?")
     base, puntos = motor.puntos_por_variable(cliente, sc)
     st.write(f"Un cliente promedio tendría unos **{base:.0f} puntos**. Las barras muestran cuántos puntos suma "
-             "(menta) o resta (rosa) cada característica de esta solicitud frente a ese cliente promedio.")
+             "(verde) o resta (rojo) cada característica de esta solicitud frente a ese cliente promedio.")
     g1, g2 = st.columns([1.3, 1])
     g1.pyplot(grafica_puntos(base, puntos), clear_figure=True)
     g2.caption("Los puntos se calculan con gradientes integrados (Sundararajan et al., 2017): se reparte entre "
