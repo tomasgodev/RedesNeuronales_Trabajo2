@@ -22,7 +22,7 @@ Todos los números salen de las salidas guardadas en los notebooks o de los scri
 
 **Equipo:** Tomás Gómez Cardona, Sebastián Ocampo Galvis, Juan Felipe Miranda Arciniegas, Ana Sofía Gómez Zapata y Juan José Baena García.
 
-**Entrada publicada en RPubs:** **[PENDIENTE]**
+**Entrada publicada en RPubs:** https://rpubs.com/juan0911miranda/1472227
 **Repositorio:** https://github.com/tomasgodev/RedesNeuronales_Trabajo2
 **Aplicación web:** https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/
 **Video promocional:** **[PENDIENTE]**
@@ -971,7 +971,7 @@ Bergstra, J., & Bengio, Y. (2012). Random search for hyper-parameter optimizatio
 
 Breiman, L. (2001). Random forests. *Machine Learning, 45*(1), 5–32. https://doi.org/10.1023/A:1010933404324
 
-Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. *Monthly Weather Review, 78*(1), 1–3. https://doi.org/10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2
+Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. *Monthly Weather Review, 78*(1), 1–3. [https://doi.org/10.1175/1520-0493(1950)078\<0001:VOFEIT\>2.0.CO;2](https://doi.org/10.1175/1520-0493(1950)078%3C0001:VOFEIT%3E2.0.CO;2)
 
 DeLong, E. R., DeLong, D. M., & Clarke-Pearson, D. L. (1988). Comparing the areas under two or more correlated receiver operating characteristic curves: A nonparametric approach. *Biometrics, 44*(3), 837–845. https://doi.org/10.2307/2531595
 
@@ -989,7 +989,7 @@ LendingClub Corporation. (2020). *Prospectus supplement No. 3320* (Formulario 42
 
 Loshchilov, I., & Hutter, F. (2019). Decoupled weight decay regularization. En *7th International Conference on Learning Representations (ICLR 2019)*. https://arxiv.org/abs/1711.05101
 
-Papke, L. E., & Wooldridge, J. M. (1996). Econometric methods for fractional response variables with an application to 401(k) plan participation rates. *Journal of Applied Econometrics, 11*(6), 619–632. https://doi.org/10.1002/(SICI)1099-1255(199611)11:6<619::AID-JAE418>3.0.CO;2-1
+Papke, L. E., & Wooldridge, J. M. (1996). Econometric methods for fractional response variables with an application to 401(k) plan participation rates. *Journal of Applied Econometrics, 11*(6), 619–632. [https://doi.org/10.1002/(SICI)1099-1255(199611)11:6\<619::AID-JAE418\>3.0.CO;2-1](https://doi.org/10.1002/(SICI)1099-1255(199611)11:6%3C619::AID-JAE418%3E3.0.CO;2-1)
 
 Paul, P., Pennell, M. L., & Lemeshow, S. (2013). Standardizing the power of the Hosmer-Lemeshow goodness of fit test in large data sets. *Statistics in Medicine, 32*(1), 67–80. https://doi.org/10.1002/sim.5525
 
