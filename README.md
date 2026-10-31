@@ -5,7 +5,7 @@ Trabajo 2 del curso *Redes neuronales y algoritmos bioinspirados* (Universidad N
 **Equipo:** Tomás Gómez Cardona, Sebastián Ocampo Galvis, Juan Felipe Miranda Arciniegas, Ana Sofía Gómez Zapata y Juan José Baena García.
 
 - **Aplicación web:** https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/
-- **Reporte técnico (blog):** pendiente de publicar en RPubs; la fuente es [`blog/blog_trabajo2.Rmd`](blog/blog_trabajo2.Rmd).
+- **Reporte técnico (blog):** https://rpubs.com/juan0911miranda/1472227 (la fuente es [`blog/blog_trabajo2.Rmd`](blog/blog_trabajo2.Rmd)).
 - **Video promocional:** pendiente.
 
 ## Inicio rápido
