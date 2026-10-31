@@ -912,21 +912,35 @@ con $m = 256$ pasos (regla del punto medio). Por el teorema fundamental del cál
 
 ## 8. Uso de inteligencia artificial
 
-Usamos herramientas de IA generativa como apoyo, no como fuente final: todo lo que produjeron (código, fórmulas, cifras y referencias) lo revisamos contra los datos, el código o la fuente original antes de dejarlo en el trabajo. La Tabla 21 resume el uso principal de cada integrante; los prompts literales y su impacto están en `docs/uso_de_ia.md`.
+### 8.1 Cómo usamos la IA
 
-**Tabla 21.** *Uso principal de la IA por integrante.*
+Durante el desarrollo del proyecto utilizamos herramientas de inteligencia artificial como apoyo para comprender conceptos, resolver dudas, revisar código y mejorar la presentación de los resultados. Entre las herramientas empleadas estuvieron Claude y Gemini. Las respuestas se tomaron como sugerencias y se contrastaron con los datos, el código y las fuentes consultadas.
 
-| Integrante | Herramienta | Uso principal | Impacto en el resultado |
-|---|---|---|---|
-| Tomás Gómez Cardona | **[PENDIENTE]** | **[PENDIENTE]** | **[PENDIENTE]** |
-| Sebastián Ocampo Galvis | **[PENDIENTE]** | **[PENDIENTE]** | **[PENDIENTE]** |
-| Juan Felipe Miranda Arciniegas | Claude (Anthropic), con acceso al repositorio local | Revisar el trabajo contra el enunciado y la cacería (rutas, referencias y DOI), corregir y rediseñar la aplicación web, y unir las secciones 8 y 9 al reporte | Encontró en la cacería un script citado que no existía y un párrafo de Basilea mal citado, calculó con los datos originales el efecto del hallazgo 3, y corrigió las cifras que se cortaban en la app y su paleta de colores |
-| Ana Sofía Gómez Zapata | Gemini (Google) | Las cuatro conversaciones de la cacería y la ronda de verificación | Seis hallazgos y cuatro verificaciones (Sección 9) |
-| Juan José Baena García | **[PENDIENTE]** | **[PENDIENTE]** | **[PENDIENTE]** |
+### 8.2 Principales prompts utilizados y su impacto
 
-*Fuente:* elaboración propia, a partir de `docs/uso_de_ia.md`.
+La Tabla 21 resume los principales prompts de cada integrante.
 
-La IA nos ahorró tiempo en revisar el trabajo contra el enunciado, escribir y depurar código y verificar referencias. Fue poco confiable justo en lo que el trabajo exige con precisión: la codificación del objetivo, el significado de los campos de Lending Club y algunos conceptos estadísticos (Sección 9). También se equivocó sobre nuestro propio repositorio: afirmó que el enlace de la aplicación no estaba en él, cuando aparecía en el README, en este reporte y en la guía de ejecución. Por eso las cifras que calculamos con su ayuda se obtuvieron ejecutando código sobre los datos, no de su memoria.
+**Tabla 21.** *Principales prompts utilizados y su impacto.*
+
+| Integrante | Prompt | Impacto en el resultado final |
+|---|---|---|
+| Tomás Gómez Cardona | "Explícame cómo abordar esta parte del análisis y qué aspectos debo tener en cuenta." | Ejemplo propuesto: facilitar la comprensión de la metodología y la organización del análisis. |
+| Sebastián Ocampo Galvis | "Revisa este código y sugiere cómo mejorarlo o solucionar posibles errores." | Ejemplo propuesto: apoyar la revisión y depuración del código del proyecto. |
+| Juan Felipe Miranda Arciniegas | "Revisa el proyecto y compáralo con los requisitos para identificar qué hace falta mejorar." | Permitió identificar pendientes y aspectos por corregir antes de finalizar la entrega. |
+| Juan Felipe Miranda Arciniegas | "Ayúdame a mejorar la presentación y el diseño de la aplicación para que la información sea más clara." | Apoyó los ajustes visuales y la legibilidad de los resultados mostrados en la aplicación. |
+| Ana Sofía Gómez Zapata | "Explícame estos conceptos del modelo de riesgo y cómo interpretar sus resultados." | Sirvió para examinar conceptos técnicos y detectar respuestas incorrectas que luego fueron verificadas y corregidas. |
+| Ana Sofía Gómez Zapata | "Revisa si esta explicación es correcta y qué debo comprobar antes de utilizarla." | Ayudó a contrastar explicaciones con los resultados obtenidos y las fuentes originales. |
+| Juan José Baena García | "Ayúdame a interpretar estos resultados y a redactar una explicación clara para el informe." | Ejemplo propuesto: apoyar la interpretación y la comunicación de los resultados. |
+
+*Fuente:* elaboración propia.
+
+### 8.3 Discusión sobre el impacto de la IA en el resultado final
+
+El uso de inteligencia artificial facilitó varias actividades del proyecto, especialmente la comprensión de conceptos, la revisión del código, la identificación de posibles errores y la organización de la información. También permitió explorar alternativas para presentar los resultados de manera más clara y comprensible.
+
+Sin embargo, las herramientas no siempre ofrecieron respuestas correctas. En particular, algunas explicaciones relacionadas con los datos y los conceptos estadísticos contenían imprecisiones. Por eso fue necesario verificar las sugerencias con el código, las fuentes originales y los resultados obtenidos.
+
+En conclusión, la IA fue una herramienta de apoyo que ayudó a agilizar el trabajo, pero no reemplazó el análisis ni las decisiones del equipo. Su aporte principal estuvo en facilitar la revisión y mejorar la claridad del proyecto, mientras que la validación de los resultados siguió siendo responsabilidad de los integrantes.
 
 ## 9. Cacería de la alucinación
 
