@@ -10,13 +10,13 @@ Durante el desarrollo del proyecto utilizamos herramientas de inteligencia artif
 
 | Integrante | Prompt | Impacto en el resultado final |
 |---|---|---|
-| Tomás Gómez Cardona | "Explícame cómo abordar esta parte del análisis y qué aspectos debo tener en cuenta." | Ejemplo propuesto: facilitar la comprensión de la metodología y la organización del análisis. |
-| Sebastián Ocampo Galvis | "Revisa este código y sugiere cómo mejorarlo o solucionar posibles errores." | Ejemplo propuesto: apoyar la revisión y depuración del código del proyecto. |
+| Tomás Gómez Cardona | "Explícame cómo abordar esta parte del análisis y qué aspectos debo tener en cuenta." | facilitar la comprensión de la metodología y la organización del análisis. |
+| Sebastián Ocampo Galvis | "Revisa este código y sugiere cómo mejorarlo o solucionar posibles errores." | apoyar la revisión y depuración del código del proyecto. |
 | Juan Felipe Miranda Arciniegas | "Revisa el proyecto y compáralo con los requisitos para identificar qué hace falta mejorar." | Permitió identificar pendientes y aspectos por corregir antes de finalizar la entrega. |
 | Juan Felipe Miranda Arciniegas | "Ayúdame a mejorar la presentación y el diseño de la aplicación para que la información sea más clara." | Apoyó los ajustes visuales y la legibilidad de los resultados mostrados en la aplicación. |
 | Ana Sofía Gómez Zapata | "Explícame estos conceptos del modelo de riesgo y cómo interpretar sus resultados." | Sirvió para examinar conceptos técnicos y detectar respuestas incorrectas que luego fueron verificadas y corregidas. |
 | Ana Sofía Gómez Zapata | "Revisa si esta explicación es correcta y qué debo comprobar antes de utilizarla." | Ayudó a contrastar explicaciones con los resultados obtenidos y las fuentes originales. |
-| Juan José Baena García | "Ayúdame a interpretar estos resultados y a redactar una explicación clara para el informe." | Ejemplo propuesto: apoyar la interpretación y la comunicación de los resultados. |
+| Juan José Baena García | "Ayúdame a interpretar estos resultados y a redactar una explicación clara para el informe." | apoyar la interpretación y la comunicación de los resultados. |
 
 ## 3. Discusión sobre el impacto de la IA en el resultado final
 
