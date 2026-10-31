@@ -11,4 +11,3 @@ Archivos de etapas anteriores del trabajo que **ya no se usan**. Se conservan co
 | `docs/blog_post_tecnico_(Borrador).md` | Primer borrador del reporte, con números de antes de unificar el preprocesamiento. | `blog/blog_trabajo2.Rmd`. |
 | `docs/fundamentacion_matematica.md` | Primera versión de la fundamentación matemática. | Sección 7 del blog, revisada contra el código (por ejemplo, el `weight_decay` de Adam y la corrección del peso de clase). |
 | `docs/observaciones_y_sugerencias.md` | Notas de revisión de los notebooks. | Los problemas señalados ya se resolvieron en los scripts y el blog. |
-| `docs/caceria_alucinaciones.md` | Borrador inicial de la cacería de la alucinación. Algunos números no coinciden con los resultados actuales. | Pendiente: la sección de cacería del blog, con hallazgos verificados de cada integrante. |

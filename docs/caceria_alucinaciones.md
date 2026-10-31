@@ -177,7 +177,7 @@ Los valores 0.78 y 0.81 eran hipotéticos; no son nuestros resultados (en prueba
 *Categoría: Conceptos. Gravedad: menor. Herramienta: Gemini. Fecha: 26/oct/2026.*
 
 1. **Prompt utilizado (literal):** el de la Conversación C.
-2. **Parte relevante de la respuesta:** tres afirmaciones, citadas en la Conversación C: calibración "exacta" obligatoria en IFRS 9 y Basilea; Brier "cercano a 0" como medida de precisión y calibración; Hosmer-Lemeshow con p > 0.05 como "meta ideal". 
+2. **Parte relevante de la respuesta:** tres afirmaciones, citadas en la Conversación C: calibración "exacta" obligatoria en IFRS 9 y Basilea; Brier "cercano a 0" como medida de precisión y calibración; Hosmer-Lemeshow con p > 0.05 como señal de buen ajuste, sin advertir el efecto del tamaño de la muestra.
 3. **Cómo sospechamos que había un error:** al comparar la respuesta con nuestros propios resultados, donde un cambio solo de calibración movió el Brier sin mover el AUC, y con las tablas de calibración por deciles. 
 4. **Evidencia:**
    - **La idea central es correcta.** La logística con y sin corrección del peso de clase tiene el mismo AUC en prueba (0.7033) y distinto Brier (0.2209 frente a 0.1722). Un AUC no dice nada sobre calibración (`resultados/parte1/metricas_pd.csv`).
