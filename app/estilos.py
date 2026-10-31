@@ -97,7 +97,12 @@ a { color: var(--lavanda-fuerte) !important; }
 [data-testid="stMetricLabel"], [data-testid="stMetricLabel"] * {
   white-space: normal !important; overflow: visible !important; text-overflow: clip !important; line-height: 1.25;
 }
-[data-testid="stMetricValue"] { font-family: var(--titulo); color: var(--ciruela); }
+/* La cifra se achica con el ancho de la tarjeta en vez de cortarse con "…" */
+[data-testid="stMetric"] { container-type: inline-size; }
+[data-testid="stMetricValue"] {
+  font-family: var(--titulo); color: var(--ciruela);
+  font-size: clamp(1.35rem, 16cqi, 2.25rem) !important; font-variant-numeric: tabular-nums;
+}
 
 /* ---------- Barra lateral ---------- */
 [data-testid="stSidebar"] {

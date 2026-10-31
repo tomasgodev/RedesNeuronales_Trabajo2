@@ -121,6 +121,14 @@ def enlace(texto, url):
     return f"[{texto}]({url})" if url else f"{texto} (enlace pendiente)"
 
 
+def moneda(valor):
+    """Cifra en dólares que cabe en una tarjeta: exacta hasta 999,999 y en millones (M) desde un millón."""
+    if abs(round(valor)) < 1e6:
+        return f"${valor:,.0f}"
+    decimales = 2 if abs(valor) < 1e7 else 1
+    return f"${valor / 1e6:,.{decimales}f} M"
+
+
 def main():
     st.set_page_config(page_title="¿Me prestas? · Riesgo de crédito", page_icon=":material/savings:", layout="wide")
     aplicar_estilos()
@@ -175,11 +183,15 @@ def main():
         st.pyplot(grafica_poblacion(motor.puntajes_poblacion(sc), r["puntaje"]), clear_figure=True)
         d, e, f = st.columns(3)
         d.metric("Pérdida si incumple (LGD)", f"{r['lgd']:.0%}")
-        e.metric("Exposición estimada (EAD)", f"${r['ead']:,.0f}")
-        f.metric("Pérdida esperada", f"${r['perdida_esperada']:,.0f}")
+        e.metric("Exposición estimada (EAD)", moneda(r["ead"]))
+        f.metric("Pérdida esperada", moneda(r["perdida_esperada"]))
+        # La pérdida esperada nunca supera la exposición, así que basta revisar la exposición.
+        # Los $ van escapados: en Markdown, dos $ en la misma línea se interpretan como una fórmula.
+        exactos = (f" Valores exactos (M = millones): exposición de \\${r['ead']:,.0f} y pérdida esperada de "
+                   f"\\${r['perdida_esperada']:,.0f}." if abs(round(r["ead"])) >= 1e6 else "")
         st.caption("Pérdida esperada = probabilidad de incumplimiento × pérdida si incumple × exposición. "
                    "La exposición es el monto por la fracción que en promedio queda pendiente al incumplir, "
-                   "según el plazo.")
+                   "según el plazo." + exactos)
 
     st.divider()
     titulo_seccion(3, "¿Por qué ese puntaje?")
