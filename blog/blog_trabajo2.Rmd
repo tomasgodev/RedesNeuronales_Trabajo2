@@ -10,23 +10,15 @@ output:
     self_contained: true
 ---
 
-<!--
-BORRADOR. Mismo formato del blog del Trabajo 1 (blog_trabajo1.Rmd).
-Las marcas [PENDIENTE] señalan lo que falta; se pueden buscar con: grep -n "PENDIENTE" blog/blog_trabajo2.Rmd
-Fuentes de contenido: archivo/docs/blog_post_tecnico_(Borrador).md, docs/parte2_lgd.md,
-archivo/docs/fundamentacion_matematica.md y las salidas de los notebooks. Ninguno de esos archivos se modificó.
-Todos los números salen de las salidas guardadas en los notebooks o de los scripts de scripts/; la fuente se indica en cada tabla y figura.
--->
-
 **Trabajo 2 · Redes neuronales y algoritmos bioinspirados · Universidad Nacional de Colombia, Facultad de Minas · 2026-02**
 
 **Equipo:** Tomás Gómez Cardona, Sebastián Ocampo Galvis, Juan Felipe Miranda Arciniegas, Ana Sofía Gómez Zapata y Juan José Baena García.
 
-**Entrada publicada en RPubs:** https://rpubs.com/juan0911miranda/1472227
-**Repositorio:** https://github.com/tomasgodev/RedesNeuronales_Trabajo2
-**Aplicación web:** https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/
-**Video promocional:** **[PENDIENTE]**
-**Videos de contribución individual:** **[PENDIENTE]**
+**Entrada publicada en RPubs:** <https://rpubs.com/juan0911miranda/1472227>\
+**Repositorio:** <https://github.com/tomasgodev/RedesNeuronales_Trabajo2>\
+**Aplicación web:** <https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/>\
+**Video promocional:** <https://canva.link/xrpw4q9vvf19v24>\
+**Videos de contribución individual:** <https://canva.link/9a2n3la84fpnyn0>
 
 ---
 

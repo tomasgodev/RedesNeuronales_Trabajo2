@@ -16,9 +16,8 @@ from scorecard_engine import CreditScorecard  # noqa: E402
 from estilos import (RIESGO_ALTO, RIESGO_BAJO, SALVIA, SALVIA_CLARA, TINTA, TINTA_SUAVE,  # noqa: E402
                      aplicar_estilos, encabezado, moneda_puntaje, titulo_seccion)
 
-# [PENDIENTE] Enlace del video promocional
 ENLACE_REPORTE = "https://rpubs.com/juan0911miranda/1472227"
-ENLACE_VIDEO = ""
+ENLACE_VIDEO = "https://canva.link/xrpw4q9vvf19v24"
 ENLACE_REPOSITORIO = "https://github.com/tomasgodev/RedesNeuronales_Trabajo2"
 
 NOMBRES = {
