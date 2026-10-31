@@ -6,7 +6,8 @@ Trabajo 2 del curso *Redes neuronales y algoritmos bioinspirados* (Universidad N
 
 - **Aplicación web:** https://redesneuronalestrabajo2-y8uxecxjqz6frn9ex3ypta.streamlit.app/
 - **Reporte técnico (blog):** https://rpubs.com/juan0911miranda/1472227 (la fuente es [`blog/blog_trabajo2.Rmd`](blog/blog_trabajo2.Rmd)).
-- **Video promocional:** pendiente.
+- **Video promocional:** https://canva.link/xrpw4q9vvf19v24
+- **Videos de contribución individual:** https://canva.link/9a2n3la84fpnyn0
 
 ## Inicio rápido
 
