@@ -34,7 +34,7 @@ Todos los comandos, sus parámetros y tiempos están en [`docs/como_ejecutar.md`
 ├── app/             Aplicación web (app_riesgo.py) y su motor (motor_riesgo.py)
 ├── blog/            Reporte técnico (blog_trabajo2.Rmd) y sus figuras
 ├── pruebas/         Casos de prueba de la app y de robustez de los scripts
-├── docs/            Guía de ejecución y notas de la Parte 2
+├── docs/            Guía de ejecución, notas de la Parte 2, cacería de la alucinación y uso de IA
 └── archivo/         Archivos de etapas anteriores que ya no se usan (ver su README)
 ```
 
